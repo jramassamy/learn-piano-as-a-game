@@ -98,11 +98,11 @@ export class AppComponent implements AfterViewInit {
     let i3 = 1;
     if (majOrMin === 4) {
       i3 = i2 + 3;
-      typeExercice = 'mineur';
+      typeExercice = 'majeur';
     }
     if (majOrMin === 3) {
       i3 = i2 + 4;
-      typeExercice = 'majeur';
+      typeExercice = 'mineur';
     }
     console.log('i', i, i2, i3);
     this.displayNotesv2([i, i2, i3], typeExercice);
