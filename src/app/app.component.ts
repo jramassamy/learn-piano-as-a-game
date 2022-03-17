@@ -48,6 +48,9 @@ export class AppComponent implements AfterViewInit {
     const answer = window.confirm("Activer le son");
     if (answer) {
       this.sound = true;
+      document.getElementsByTagName('footer')[0].classList.remove('hidden');
+    } else {
+      document.getElementsByTagName('footer')[0].classList.remove('hidden');
     }
     this.setupPiano();
     this.initPianoSong();
