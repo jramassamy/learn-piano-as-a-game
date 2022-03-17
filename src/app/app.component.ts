@@ -10,12 +10,12 @@ export class AppComponent implements AfterViewInit {
   title = 'piano';
   whiteKeyWidth = 80;
   pianoHeight = 400;
-  timerRefresh = 2000;
+  timerRefresh = 4000;
   naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
   naturalNotesSharps: string[] = ["C", "D", "F", "G", "A"];
   naturalNotesFlats = ["D", "E", "G", "A", "B"];
   nameNote = '';
-  range = ["C1", "B5"];
+  range = ["C1", "E4"];
   mySubscription: any;
 
 
@@ -43,7 +43,6 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.setupPiano();
-    this.generateNotesRandomly();
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
     }));
@@ -60,8 +59,16 @@ export class AppComponent implements AfterViewInit {
       this.generateNotesRandomly();
     }));
   }
+
   generateNotesRandomly() {
-    const i = this.getRandomIntInclusive(1, 53);
+    let i = -1;
+    if (this.gamme === 'all') {
+      i = this.getRandomIntInclusive(1, 33);
+    }
+    if (this.gamme === 'do_majeur') {
+      const randomIndex = this.getRandomIntInclusive(0, this.listGammeDoMajeur.length - 1);
+      i = this.listGammeDoMajeur[randomIndex];
+    }
     const majOrMin = this.getRandomIntInclusive(3, 4);
     this.nameNote = '';
     const i2 = i + majOrMin; // +3 or +4
@@ -75,6 +82,7 @@ export class AppComponent implements AfterViewInit {
       i3 = i2 + 4;
       typeExercice = 'majeur';
     }
+    console.log('i', i, i2, i3);
     this.displayNotesv2([i, i2, i3], typeExercice);
   }
 
@@ -274,6 +282,8 @@ export class AppComponent implements AfterViewInit {
     return pianoKeys;
   }
 
+  listGammeDoMajeur = [1, 3, 5, 6, 8, 10, 12, 13, 15, 17, 18, 20, 22, 24, 25, 27, 29, 30, 32]; // max = 33;
+
   allNotes: string[][] = [
     ['C1', '1']
     , ['C#1', 'Db1', '2']
@@ -316,26 +326,6 @@ export class AppComponent implements AfterViewInit {
     , ['D4', '39']
     , ['D#4', 'Eb4', '40']
     , ['E4', '41']
-    , ['F4', '42']
-    , ['F#4', 'Gb4', '43']
-    , ['G4', '44']
-    , ['G#4', 'Ab4', '45']
-    , ['A4', '46']
-    , ['A#4', 'Bb4', '47']
-    , ['B4', '48']
-    , ['C5', '49']
-    , ['C#5', 'Db5', '50']
-    , ['D5', '51']
-    , ['D#5', 'Eb5', '52']
-    , ['E5', '53']
-    , ['F5', '54']
-    , ['F#5', 'Gb5', '55']
-    , ['G5', '56']
-    , ['G#5', 'Ab5', '57']
-    , ['A5', '58']
-    , ['A#5', 'Bb5', '59']
-    , ['B5', '60']
-    , ['C6', '61']
   ];
 
   displayNotesv2(notes: number[], type: string) {
@@ -345,13 +335,49 @@ export class AppComponent implements AfterViewInit {
     });
     const baseNoteIndex = notes[0];
     const baseNoteName = this.allNotes[baseNoteIndex - 1][0];
-    this.nameNote = `${baseNoteName.charAt(0)} ${type}`;
+    let diese = '';
+    if (baseNoteName.includes('#')) // 
+      diese = '#';
+    this.nameNote = `${baseNoteName.charAt(0)}${diese} (${this.translateToFrench(baseNoteName.charAt(0))}${diese}) ${type}`;
+    if (diese) {
+      const baseNoteNameBemol = this.allNotes[baseNoteIndex - 1][1];
+      this.nameNote += ` / ${baseNoteNameBemol.charAt(0)}♭ (${this.translateToFrench(baseNoteNameBemol.charAt(0))}♭) ${type}`;
+    }
     this.displayNotes(list);
+  }
+
+  translateToFrench(letter: string) {
+    if (letter === 'C')
+      return 'Do';
+    if (letter === 'D')
+      return 'Ré';
+    if (letter === 'E')
+      return 'Mi';
+    if (letter === 'F')
+      return 'Fa';
+    if (letter === 'G')
+      return 'Sol';
+    if (letter === 'A')
+      return 'La';
+    if (letter === 'B')
+      return 'Si';
+    return '?';
   }
 
   getRandomIntInclusive(min: number, max: number) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  gammeDoMajeur() {
+    this.displayNotes(['C1', 'D1', 'E1', 'F1', 'G1', 'A1', 'B1',]);
+  }
+
+  gamme = 'all';
+
+  updateGamme(value: string) {
+    this.gamme = value;
+    // this.gamme = value;
   }
 }

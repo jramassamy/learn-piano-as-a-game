@@ -1,3 +1,6 @@
+app-root {
+  height: 100%;
+}
 * {
   margin: 0;
   padding: 0;
@@ -9,8 +12,7 @@
 }
 
 .white-key {
-  stroke: #555555;
-  stroke-width: 5px;
+  stroke: black;
   fill: #fffff7;
 }
 .black-key {
@@ -46,6 +48,7 @@
   select {
     height: 36px;
     max-height: 36px;
-    max-width: 200px;
+    width: 170px;
+    max-width: 170px;
   }
 }

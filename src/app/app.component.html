@@ -1,27 +1,31 @@
-<div class="flex justify-start flex-col items-center">
-    <div id="piano" class="w-full"></div>
-    <p class="w-full text-center font-medium mt-4 p-2 text-lg uppercase text-white">Note: {{nameNote}}
+<div class="flex justify-start flex-col items-center h-full">
+    <div id="piano" style="width: 70%;"></div>
+    <p class="w-full text-center font-medium mt-8 p-2X uppercase text-white" style="font-size: 2.5rem;">{{nameNote}}
     </p>
-    <div class="text-white mt-8 w-full">
-        <p class="text-center uppercase">Réglages</p>
-        <div class="flex settings mt-4 w-full justify-center items-center">
-            <p>Timer</p>
-            <input (ngModelChange)="updateTimer($event)" [(ngModel)]="timerRefresh" class="pl-2 text-black"
-                type="number" step="1000">
-            <p>Type d'accords</p>
-            <select id="exercice" name="exercice"
-                class="text-black block w-full pl-3 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                <option selected>Mineur/Majeur</option>
-                <option>Mineur</option>
-                <option>Majeur</option>
-                <option>Diminuée</option>
-                <option>Augmentée</option>
-            </select>
-            <p>Gamme</p>
-            <select id="exercice" name="exercice"
-                class="text-black block w-full pl-3 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                <option selected>Toutes</option>
-            </select>
+    <div class="flex flex-grow justify-center items-end">
+        <div class="text-white mt-8 w-full">
+            <p class="text-center uppercase">Réglages</p>
+            <div class="flex settings mt-4 w-full justify-center items-center">
+                <p>Timer (ms)</p>
+                <input (ngModelChange)="updateTimer($event)" [(ngModel)]="timerRefresh"
+                    class="text-black block w-full pl-2 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    type="number" step="1000">
+                <p>Type d'accords</p>
+                <select id="exercice" name="exercice"
+                    class="text-black block w-full pl-2 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option selected>Mineur/Majeur</option>
+                    <option>Mineur</option>
+                    <option>Majeur</option>
+                    <option>Diminuée</option>
+                    <option>Augmentée</option>
+                </select>
+                <p>Gammes</p>
+                <select (change)="updateGamme(gamme.value)" #gamme
+                    class="text-black block w-full pl-2 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="all" selected>Toutes</option>
+                    <option value="do_majeur">Do Majeur</option>
+                </select>
+            </div>
         </div>
     </div>
     <!-- <div>
