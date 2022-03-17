@@ -1,0 +1,51 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#piano {
+  clip-path: inset(15px 0px 0px 0px);
+  margin-top: -15px;
+}
+
+.white-key {
+  stroke: #555555;
+  stroke-width: 5px;
+  fill: #fffff7;
+}
+.black-key {
+  stroke: #979797;
+  fill: #4b4b4b;
+}
+.white-key-text {
+  font-size: 1.3em;
+  pointer-events: none;
+  user-select: none;
+}
+.black-key-text {
+  font-size: 1em;
+  fill: #fff;
+  font-weight: 200;
+  pointer-events: none;
+  user-select: none;
+}
+.show {
+  fill: #ffdc00;
+}
+
+.show.black-key ~ text {
+  fill: #000;
+}
+
+.settings {
+  > * {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+  input,
+  select {
+    height: 36px;
+    max-height: 36px;
+    max-width: 200px;
+  }
+}
