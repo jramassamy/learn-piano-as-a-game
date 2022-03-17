@@ -21,7 +21,7 @@ export class AppComponent implements AfterViewInit {
   mySubscription: any;
   pianoSong: any;
   sound = false;
-
+  toneLoadingState = 'LOADING';
   utils = {
     createSVGElement(el: any) {
       const element = document.createElementNS("http://www.w3.org/2000/svg", el);
@@ -45,15 +45,11 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    const answer = window.confirm("Activer le son");
-    if (answer) {
-      this.sound = true;
-      document.getElementsByTagName('footer')[0].classList.remove('hidden');
-    } else {
-      document.getElementsByTagName('footer')[0].classList.remove('hidden');
-    }
     this.setupPiano();
     this.initPianoSong();
+    Tone.loaded().then(() => {
+      this.toneLoadingState = 'LOADED';
+    })
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
     }));
@@ -389,7 +385,7 @@ export class AppComponent implements AfterViewInit {
         note = note.replace('4', '6');
       newList.push(note);
     };
-    if (this.sound)
+    if (this.sound && this.toneLoadingState === 'LOADED')
       this.pianoSong.triggerAttackRelease([...newList], 2.5);
   }
 
