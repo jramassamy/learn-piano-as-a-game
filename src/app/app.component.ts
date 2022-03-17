@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
+import * as Tone from 'tone';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -10,14 +11,16 @@ export class AppComponent implements AfterViewInit {
   title = 'piano';
   whiteKeyWidth = 80;
   pianoHeight = 400;
+  timerSecondsBased = 4;
   timerRefresh = 4000;
   naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
   naturalNotesSharps: string[] = ["C", "D", "F", "G", "A"];
   naturalNotesFlats = ["D", "E", "G", "A", "B"];
-  nameNote = '';
+  nameNote = `Nom de l'accord`;
   range = ["C1", "E4"];
   mySubscription: any;
-
+  pianoSong: any;
+  sound = false;
 
   utils = {
     createSVGElement(el: any) {
@@ -42,18 +45,38 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    const answer = window.confirm("Activer le son");
+    if (answer) {
+      this.sound = true;
+    }
     this.setupPiano();
+    this.initPianoSong();
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
     }));
   }
 
+  initPianoSong() {
+    this.pianoSong = new Tone.Sampler({
+      urls: {
+        "C4": "C4.mp3",
+        "D#4": "Ds4.mp3",
+        "F#4": "Fs4.mp3",
+        "A4": "A4.mp3",
+      },
+      release: 1,
+      baseUrl: "https://tonejs.github.io/audio/salamander/",
+    }).toDestination();
+  }
   constructor() {
-
   }
 
+  soundAuthorized() {
+    this.sound = !this.sound;
+  }
   updateTimer(newValue: number) {
-    this.timerRefresh = newValue;
+    this.timerSecondsBased = newValue;
+    this.timerRefresh = newValue * 1000;
     this.mySubscription.unsubscribe();
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
@@ -84,6 +107,13 @@ export class AppComponent implements AfterViewInit {
     }
     console.log('i', i, i2, i3);
     this.displayNotesv2([i, i2, i3], typeExercice);
+  }
+
+  noteTestName = '';
+
+  updateNote(note: string) {
+    this.noteTestName = note;
+    this.pianoSong.triggerAttackRelease([note], 4);
   }
 
   setupPiano() {
@@ -344,6 +374,20 @@ export class AppComponent implements AfterViewInit {
       this.nameNote += ` / ${baseNoteNameBemol.charAt(0)}♭ (${this.translateToFrench(baseNoteNameBemol.charAt(0))}♭) ${type}`;
     }
     this.displayNotes(list);
+    let newList: any = []; // change tone +2
+    for (let note of list) {
+      if (note.includes('1'))
+        note = note.replace('1', '3');
+      else if (note.includes('2'))
+        note = note.replace('2', '4');
+      else if (note.includes('3'))
+        note = note.replace('3', '5');
+      else if (note.includes('4'))
+        note = note.replace('4', '6');
+      newList.push(note);
+    };
+    if (this.sound)
+      this.pianoSong.triggerAttackRelease([...newList], 2.5);
   }
 
   translateToFrench(letter: string) {

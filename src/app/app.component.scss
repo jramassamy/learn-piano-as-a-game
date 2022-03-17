@@ -43,12 +43,13 @@ app-root {
   > * {
     margin-left: 1rem;
     margin-right: 1rem;
+    margin-bottom: 1rem;
   }
   input,
   select {
     height: 36px;
     max-height: 36px;
-    width: 170px;
-    max-width: 170px;
+    width: 180px;
+    max-width: 180px;
   }
 }

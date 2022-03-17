@@ -1,15 +1,24 @@
 <div class="flex justify-start flex-col items-center h-full">
-    <div id="piano" style="width: 70%;"></div>
-    <p class="w-full text-center font-medium mt-8 p-2X uppercase text-white" style="font-size: 2.5rem;">{{nameNote}}
+    <div id="piano" class="xl:w-3/4 w-full" allow="autoplay"></div>
+    <p class="w-full text-center font-medium mt-4 xl:mt-8 p-2 uppercase text-white text-2xl xl:text-4xl">{{nameNote}}
     </p>
+    <button (click)="soundAuthorized()"
+        class="mt-4 flex bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+        <ng-container *ngIf="!sound">
+            <span>Activer le son</span> <img class="ml-2 invert" src="./assets/volume.png" />
+        </ng-container>
+        <ng-container *ngIf="sound">
+            <span>Désactiver le son</span> <img class="ml-2 invert" src="./assets/volume-mute.png" />
+        </ng-container>
+    </button>
     <div class="flex flex-grow justify-center items-end">
         <div class="text-white mt-8 w-full">
-            <p class="text-center uppercase">Réglages</p>
-            <div class="flex settings mt-4 w-full justify-center items-center">
-                <p>Timer (ms)</p>
-                <input (ngModelChange)="updateTimer($event)" [(ngModel)]="timerRefresh"
+            <p class="text-center uppercase font-medium">Réglages</p>
+            <div class="flex flex-wrap flex-col lg:flex-row settings mt-2 w-full justify-center items-center">
+                <p>Temps Changement Notes (secondes)</p>
+                <input (ngModelChange)="updateTimer($event)" [(ngModel)]="timerSecondsBased"
                     class="text-black block w-full pl-2 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                    type="number" step="1000">
+                    type="number" step="1">
                 <p>Type d'accords</p>
                 <select id="exercice" name="exercice"
                     class="text-black block w-full pl-2 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
@@ -28,14 +37,4 @@
             </div>
         </div>
     </div>
-    <!-- <div>
-        <label for="exercice" class="block text-sm font-medium text-gray-700">Exercice</label>
-        <select id="exercice" name="exercice"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-            <option>United States</option>
-            <option selected>Canada</option>
-            <option>Mexico</option>
-        </select>
-    </div> -->
-    <!-- This example requires Tailwind CSS v2.0+ -->
 </div>
