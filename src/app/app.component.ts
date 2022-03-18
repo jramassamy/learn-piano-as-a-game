@@ -76,6 +76,12 @@ export class AppComponent implements AfterViewInit {
 
   soundAuthorized() {
     this.sound = !this.sound;
+    console.log('Tone', Tone.context.state);
+    Tone.loaded().then(() => {
+      if (Tone.context.state !== 'running') {
+        Tone.context.resume();
+      }
+    });
   }
 
   touch($event: any) {
