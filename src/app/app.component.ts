@@ -2,6 +2,8 @@ import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import * as Tone from 'tone';
 const unmuteAudio = require('unmute-ios-audio');
+const { Howl, Howler } = require('howler');
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -12,8 +14,8 @@ export class AppComponent implements AfterViewInit {
   title = 'piano';
   whiteKeyWidth = 80;
   pianoHeight = 400;
-  timerSecondsBased = 4;
-  timerRefresh = 4000;
+  timerSecondsBased = 40;
+  timerRefresh = 40000;
   naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
   naturalNotesSharps: string[] = ["C", "D", "F", "G", "A"];
   naturalNotesFlats = ["D", "E", "G", "A", "B"];
@@ -52,9 +54,13 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.setupPiano();
     this.initPianoSong();
-    Tone.loaded().then(() => {
+    Tone.loaded().then(async () => {
+      console.log('init tone');
+      Tone.context.resume();
+      await Tone.start();
       this.toneLoadingState = 'LOADED';
-    })
+    });
+    this.generateNotesRandomly();
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
     }));
@@ -78,12 +84,12 @@ export class AppComponent implements AfterViewInit {
 
   async soundAuthorized() {
     this.sound = !this.sound;
+    Tone.context.resume();
     await Tone.start();
     console.log('audio is ready');
   }
 
   touch($event: any) {
-    console.log('hey');
   }
 
   updateTimer(newValue: number) {
@@ -98,7 +104,6 @@ export class AppComponent implements AfterViewInit {
   generateNotesRandomly() {
     let firstNote = this.randomNoteFromGamme(this.gammeParameter)
     const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote);
-    console.log('triade to play', triadeNotesToPlay);
     this.displayNotesv2(triadeNotesToPlay);
   }
 
@@ -334,15 +339,35 @@ export class AppComponent implements AfterViewInit {
   bindNotesIds() {
     const pianoKeys = this.retrieveNotesAfterCleaning();
     let i = 0;
-    pianoKeys.forEach((key: any) => {
-      const currentNote = this.allNotes[i]
+    this.allNotes.forEach((note) => {
+
+    });
+    pianoKeys.forEach((key: any) => { // rewrite code here
+      console.log(key.dataset);
+      let nameKey = '';
+      if (key.dataset.noteName)
+        nameKey = key.dataset.noteName;
+      else if (key.dataset.sharpName)
+        nameKey = key.dataset.sharpName;
+      const idNote = this.findIdByName(nameKey);
+      key.classList.add(`note${idNote}`);
+      console.log(nameKey, 'new note binded', idNote);
+      /*
+      const currentNote = this.allNotes[i];
       const lengthNote = currentNote.length;
       const idNote = currentNote[lengthNote - 1]; // represent ID of my note
-      key.classList.add(`note${idNote}`);
       i++
+      */
     });
   }
 
+  findIdByName(name: string): string {
+    for (let note of this.allNotes) {
+      if (note[0] === name)
+        return note[note.length - 1]; // id of the note
+    }
+    return '-1';
+  }
   retrieveNotesAfterCleaning() {
     let pianoKeys = document.querySelectorAll(".key");
     this.utils.removeClassFromNodeCollection(pianoKeys, "show");
@@ -395,7 +420,7 @@ export class AppComponent implements AfterViewInit {
     , ['E4', '41']
   ];
 
-  displayNotesv2(idNotes: number[]) {
+  async displayNotesv2(idNotes: number[]) {
     this.retrieveNotesAfterCleaning();
     this.displayNotes(idNotes);
     let newList: string[] = [];
@@ -411,13 +436,13 @@ export class AppComponent implements AfterViewInit {
         noteName = noteName.replace('4', '6');
       newList.push(noteName);
     };
-    console.log('newlist', newList);
+    console.log('id of the notes', idNotes);
+    console.log('notes that will be played', newList);
     if (this.sound && this.toneLoadingState === 'LOADED') {
       console.log('tone state for debug purpose', Tone.context.state);
       if (Tone.context.state !== 'running') {
-        console.log('resume tone plz sir', Tone.context.state);
         Tone.context.resume();
-        Tone.start();
+        await Tone.start();
         console.log('tone resumed ?', Tone.context.state);
       }
       this.pianoSong.triggerAttackRelease([...newList], 2.5);
@@ -426,7 +451,6 @@ export class AppComponent implements AfterViewInit {
 
   setText(noteKey: number) {
     const note = this.allNotes[noteKey];
-    console.log('note', note);
     let diese = '';
     if (note[0].includes('#')) // 
       diese = '#';
