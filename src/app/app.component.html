@@ -14,6 +14,15 @@
         </button>
     </div>
     <div class="flex flex-grow justify-center items-center flex-col">
+        <div class="flex flex-col justify-center items-center my-4 text-white">
+            <p class="my-2">Debug Purpose</p>
+            <p class="my-2">version {{version}}</p>
+            <div class="my-2">
+                <button
+                    class="flex justify-center items-center bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
+                    (click)="forceReload()">reload</button>
+            </div>
+        </div>
         <div class="text-white mt-4 lg:mt-8 w-full">
             <p class="text-center uppercase font-medium cursor-pointer mb-4 lg:mb-8"
                 (click)="hideElements = !hideElements">

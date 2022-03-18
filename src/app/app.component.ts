@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import * as Tone from 'tone';
 const StartAudioContext = require('startaudiocontext');
@@ -30,6 +30,8 @@ export class AppComponent implements AfterViewInit {
   gammeParameter: string = 'all';
   triadeTypeParameter: string = 'all'; // 'min' | 'maj' | 'all'
   typeExercice: string = '';
+  version = '1.0.0';
+  myAppURL = 'https://piano-as-a-game.herokuapp.com';
   utils = {
     createSVGElement(el: any) {
       const element = document.createElementNS("http://www.w3.org/2000/svg", el);
@@ -64,6 +66,11 @@ export class AppComponent implements AfterViewInit {
 
   touch($event: any) {
     console.log('touch', $event);
+  }
+
+
+  forceReload() {
+    window.location.href = window.location.href;
   }
 
   initPianoSong() {
