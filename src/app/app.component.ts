@@ -413,6 +413,7 @@ export class AppComponent implements AfterViewInit {
     };
     console.log('newlist', newList);
     if (this.sound && this.toneLoadingState === 'LOADED') {
+      console.log('tone state for debug purpose', Tone.context.state);
       if (Tone.context.state !== 'running') {
         console.log('resume tone plz sir', Tone.context.state);
         Tone.context.resume();
