@@ -74,6 +74,11 @@ export class AppComponent implements AfterViewInit {
   soundAuthorized() {
     this.sound = !this.sound;
   }
+
+  touch($event: any) {
+    console.log('hey');
+  }
+
   updateTimer(newValue: number) {
     this.timerSecondsBased = newValue;
     this.timerRefresh = newValue * 1000;
