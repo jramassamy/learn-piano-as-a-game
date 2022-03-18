@@ -63,7 +63,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   touch($event: any) {
-
+    console.log('touch', $event);
   }
 
   initPianoSong() {
@@ -73,7 +73,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   async soundAuthorized() {
-    this.sound = !this.sound;
+    this.sound = true;
     this.pianoSong = new Tone.Sampler({
       urls: {
         "C4": "C4.mp3",
