@@ -74,8 +74,10 @@ export class AppComponent implements AfterViewInit {
   constructor() {
   }
 
-  soundAuthorized() {
+  async soundAuthorized() {
     this.sound = !this.sound;
+    await Tone.start();
+    console.log('audio is ready');
   }
 
   touch($event: any) {
