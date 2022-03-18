@@ -3,7 +3,7 @@
     <p class="w-full text-center font-medium mt-4 xl:mt-8 p-2 uppercase text-white text-2xl xl:text-4xl">{{nameNote}}
     </p>
     <div class="flex w-full justify-center items-center mt-4">
-        <button (click)="soundAuthorized()" (touchmove)="touch($event)" (touchstart)="touch($event)"
+        <button id="buttonSound" (click)="soundAuthorized()" (touchmove)="touch($event)" (touchstart)="touch($event)"
             (touchend)="touch($event)" (mousedown)="touch($event)" (mouseup)="touch($event)" style="min-width: 200px;"
             class="flex justify-center items-center bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
             <ng-container *ngIf="!sound">

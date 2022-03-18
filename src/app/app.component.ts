@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import * as Tone from 'tone';
+const StartAudioContext = require('startaudiocontext');
+
 const unmuteAudio = require('unmute-ios-audio');
-const { Howl, Howler } = require('howler');
 
 @Component({
   selector: 'app-root',
@@ -14,8 +15,8 @@ export class AppComponent implements AfterViewInit {
   title = 'piano';
   whiteKeyWidth = 80;
   pianoHeight = 400;
-  timerSecondsBased = 40;
-  timerRefresh = 40000;
+  timerSecondsBased = 4;
+  timerRefresh = 4000;
   naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
   naturalNotesSharps: string[] = ["C", "D", "F", "G", "A"];
   naturalNotesFlats = ["D", "E", "G", "A", "B"];
@@ -60,6 +61,9 @@ export class AppComponent implements AfterViewInit {
       await Tone.start();
       this.toneLoadingState = 'LOADED';
     });
+    StartAudioContext(Tone.context, '#buttonSound', () => {
+
+    });
     this.generateNotesRandomly();
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
@@ -90,6 +94,9 @@ export class AppComponent implements AfterViewInit {
   }
 
   touch($event: any) {
+    StartAudioContext(Tone.context, '#buttonSound', () => {
+
+    });
   }
 
   updateTimer(newValue: number) {
