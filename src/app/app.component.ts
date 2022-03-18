@@ -76,12 +76,6 @@ export class AppComponent implements AfterViewInit {
 
   soundAuthorized() {
     this.sound = !this.sound;
-    console.log('Tone', Tone.context.state);
-    Tone.loaded().then(() => {
-      if (Tone.context.state !== 'running') {
-        Tone.context.resume();
-      }
-    });
   }
 
   touch($event: any) {
@@ -414,8 +408,14 @@ export class AppComponent implements AfterViewInit {
       newList.push(noteName);
     };
     console.log('newlist', newList);
-    if (this.sound && this.toneLoadingState === 'LOADED')
+    if (this.sound && this.toneLoadingState === 'LOADED') {
+      if (Tone.context.state !== 'running') {
+        console.log('resume tone plz sir', Tone.context.state);
+        Tone.context.resume();
+        console.log('tone resumed ?', Tone.context.state);
+      }
       this.pianoSong.triggerAttackRelease([...newList], 2.5);
+    }
   }
 
   setText(noteKey: number) {
