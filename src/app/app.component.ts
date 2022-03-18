@@ -53,6 +53,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    unmuteAudio();
     this.setupPiano();
     this.initPianoSong();
     this.test();
@@ -79,28 +80,23 @@ export class AppComponent implements AfterViewInit {
 
   async soundAuthorized() {
     this.sound = !this.sound;
-    Tone.loaded().then(async () => {
-      Tone.context.resume();
-      await Tone.start();
-      this.pianoSong = new Tone.Sampler({
-        urls: {
-          "C4": "C4.mp3",
-          "D#4": "Ds4.mp3",
-          "F#4": "Fs4.mp3",
-          "A4": "A4.mp3",
-        },
-        release: 1,
-        baseUrl: "https://tonejs.github.io/audio/salamander/",
-      }).toDestination();
-      Tone.context.resume();
-      await Tone.start();
-      this.toneLoadingState = 'LOADED';
-      console.log('audio is ready');
-    });
+    this.pianoSong = new Tone.Sampler({
+      urls: {
+        "C4": "C4.mp3",
+        "D#4": "Ds4.mp3",
+        "F#4": "Fs4.mp3",
+        "A4": "A4.mp3",
+      },
+      release: 1,
+      baseUrl: "https://tonejs.github.io/audio/salamander/",
+    }).toDestination();
+    Tone.context.resume();
+    await Tone.start();
+    this.toneLoadingState = 'LOADED';
+    console.log('audio is ready');
   }
 
   test() {
-    unmuteAudio();
     window.addEventListener('touchstart', () => {
       var AudioContext = window.AudioContext || (window as any).webkitAudioContext;
       var context = new AudioContext();
