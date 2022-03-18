@@ -55,50 +55,68 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.setupPiano();
     this.initPianoSong();
+    this.test();
     Tone.loaded().then(async () => {
       console.log('init tone');
       Tone.context.resume();
       await Tone.start();
       this.toneLoadingState = 'LOADED';
     });
-    StartAudioContext(Tone.context, '#buttonSound', () => {
-
-    });
-    this.generateNotesRandomly();
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
     }));
   }
 
-  initPianoSong() {
-    unmuteAudio();
-    this.pianoSong = new Tone.Sampler({
-      urls: {
-        "C4": "C4.mp3",
-        "D#4": "Ds4.mp3",
-        "F#4": "Fs4.mp3",
-        "A4": "A4.mp3",
-      },
-      release: 1,
-      baseUrl: "https://tonejs.github.io/audio/salamander/",
-    }).toDestination();
+  touch($event: any) {
+
   }
+
+  initPianoSong() {
+  }
+
   constructor() {
   }
 
   async soundAuthorized() {
     this.sound = !this.sound;
-    Tone.context.resume();
-    await Tone.start();
-    console.log('audio is ready');
-  }
-
-  touch($event: any) {
-    StartAudioContext(Tone.context, '#buttonSound', () => {
-
+    Tone.loaded().then(async () => {
+      Tone.context.resume();
+      await Tone.start();
+      this.pianoSong = new Tone.Sampler({
+        urls: {
+          "C4": "C4.mp3",
+          "D#4": "Ds4.mp3",
+          "F#4": "Fs4.mp3",
+          "A4": "A4.mp3",
+        },
+        release: 1,
+        baseUrl: "https://tonejs.github.io/audio/salamander/",
+      }).toDestination();
+      Tone.context.resume();
+      await Tone.start();
+      this.toneLoadingState = 'LOADED';
+      console.log('audio is ready');
     });
   }
 
+  test() {
+    unmuteAudio();
+    window.addEventListener('touchstart', () => {
+      var AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      var context = new AudioContext();
+      // create empty buffer
+      var buffer = context.createBuffer(1, 1, 22050);
+      var source = context.createBufferSource();
+      source.buffer = buffer;
+
+      // connect to output (your speakers)
+      source.connect(context.destination);
+
+      // play the file
+      source.start ? source.start(0) : (source as any).noteOn(0);
+      console.log('do a weird trick');
+    }, false);
+  }
   updateTimer(newValue: number) {
     this.timerSecondsBased = newValue;
     this.timerRefresh = newValue * 1000;
@@ -350,7 +368,6 @@ export class AppComponent implements AfterViewInit {
 
     });
     pianoKeys.forEach((key: any) => { // rewrite code here
-      console.log(key.dataset);
       let nameKey = '';
       if (key.dataset.noteName)
         nameKey = key.dataset.noteName;
@@ -358,7 +375,6 @@ export class AppComponent implements AfterViewInit {
         nameKey = key.dataset.sharpName;
       const idNote = this.findIdByName(nameKey);
       key.classList.add(`note${idNote}`);
-      console.log(nameKey, 'new note binded', idNote);
       /*
       const currentNote = this.allNotes[i];
       const lengthNote = currentNote.length;
@@ -443,10 +459,7 @@ export class AppComponent implements AfterViewInit {
         noteName = noteName.replace('4', '6');
       newList.push(noteName);
     };
-    console.log('id of the notes', idNotes);
-    console.log('notes that will be played', newList);
     if (this.sound && this.toneLoadingState === 'LOADED') {
-      console.log('tone state for debug purpose', Tone.context.state);
       if (Tone.context.state !== 'running') {
         Tone.context.resume();
         await Tone.start();
@@ -497,4 +510,5 @@ export class AppComponent implements AfterViewInit {
   updateTriadeParameter(value: string) {
     this.triadeTypeParameter = value;
   }
+
 }
