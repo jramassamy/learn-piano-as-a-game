@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import * as Tone from 'tone';
+const unmuteAudio = require('unmute-ios-audio');
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -60,6 +61,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   initPianoSong() {
+    unmuteAudio();
     this.pianoSong = new Tone.Sampler({
       urls: {
         "C4": "C4.mp3",
@@ -414,6 +416,7 @@ export class AppComponent implements AfterViewInit {
       if (Tone.context.state !== 'running') {
         console.log('resume tone plz sir', Tone.context.state);
         Tone.context.resume();
+        Tone.start();
         console.log('tone resumed ?', Tone.context.state);
       }
       this.pianoSong.triggerAttackRelease([...newList], 2.5);
