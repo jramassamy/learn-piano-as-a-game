@@ -57,12 +57,6 @@ export class AppComponent implements AfterViewInit {
     this.setupPiano();
     this.initPianoSong();
     this.test();
-    Tone.loaded().then(async () => {
-      console.log('init tone');
-      Tone.context.resume();
-      await Tone.start();
-      this.toneLoadingState = 'LOADED';
-    });
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
     }));
@@ -92,7 +86,6 @@ export class AppComponent implements AfterViewInit {
     }).toDestination();
     Tone.context.resume();
     await Tone.start();
-    this.toneLoadingState = 'LOADED';
     console.log('audio is ready');
   }
 
@@ -455,7 +448,7 @@ export class AppComponent implements AfterViewInit {
         noteName = noteName.replace('4', '6');
       newList.push(noteName);
     };
-    if (this.sound && this.toneLoadingState === 'LOADED') {
+    if (this.sound) {
       if (Tone.context.state !== 'running') {
         Tone.context.resume();
         await Tone.start();
