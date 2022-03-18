@@ -23,6 +23,9 @@ export class AppComponent implements AfterViewInit {
   sound = false;
   toneLoadingState = 'LOADING';
   hideElements = false;
+  gammeParameter: string = 'all';
+  triadeTypeParameter: string = 'all'; // 'min' | 'maj' | 'all'
+  typeExercice: string = '';
   utils = {
     createSVGElement(el: any) {
       const element = document.createElementNS("http://www.w3.org/2000/svg", el);
@@ -36,8 +39,8 @@ export class AppComponent implements AfterViewInit {
     addTextContent(el: any, content: any) {
       el.textContent = content;
     },
-    removeClassFromNodeCollection(nodeCollection: any, classToRemove: any) {
-      nodeCollection.forEach((node: any) => {
+    removeClassFromNodeCollection(nodeCollection: NodeListOf<Element>, classToRemove: string) {
+      nodeCollection.forEach((node: Element) => {
         if (node.classList.contains(classToRemove)) {
           node.classList.remove(classToRemove);
         }
@@ -89,36 +92,47 @@ export class AppComponent implements AfterViewInit {
   }
 
   generateNotesRandomly() {
+    let firstNote = this.randomNoteFromGamme(this.gammeParameter)
+    const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote);
+    console.log('triade to play', triadeNotesToPlay);
+    this.displayNotesv2(triadeNotesToPlay);
+  }
+
+  randomNoteFromGamme(choice: string): number {
     let i = -1;
-    if (this.gamme === 'all') {
+    if (choice === 'all') {
       i = this.getRandomIntInclusive(1, 33);
     }
-    if (this.gamme === 'do_majeur') {
+    if (choice === 'do_majeur') {
       const randomIndex = this.getRandomIntInclusive(0, this.listGammeDoMajeur.length - 1);
       i = this.listGammeDoMajeur[randomIndex];
     }
-    const majOrMin = this.getRandomIntInclusive(3, 4);
-    this.nameNote = '';
-    const i2 = i + majOrMin; // +3 or +4
-    let typeExercice = '';
-    let i3 = 1;
-    if (majOrMin === 4) {
-      i3 = i2 + 3;
-      typeExercice = 'majeur';
-    }
-    if (majOrMin === 3) {
-      i3 = i2 + 4;
-      typeExercice = 'mineur';
-    }
-    console.log('i', i, i2, i3);
-    this.displayNotesv2([i, i2, i3], typeExercice);
+    return i;
   }
 
-  noteTestName = '';
-
-  updateNote(note: string) {
-    this.noteTestName = note;
-    this.pianoSong.triggerAttackRelease([note], 4);
+  triadesNotes(choice: string, firstNote: number): number[] {
+    let majOrMin: number = -1;
+    if (choice === 'all') {
+      majOrMin = this.getRandomIntInclusive(3, 4);
+    }
+    if (choice === 'min') {
+      majOrMin = 3;
+    }
+    if (choice === 'maj') {
+      majOrMin = 4;
+    }
+    this.nameNote = '';
+    const secondNote = firstNote + majOrMin; // +3 or +4
+    let thirdNote = 1;
+    if (majOrMin === 4) {
+      thirdNote = secondNote + 3;
+      this.typeExercice = 'majeur';
+    }
+    if (majOrMin === 3) {
+      thirdNote = secondNote + 4;
+      this.typeExercice = 'mineur';
+    }
+    return [firstNote, secondNote, thirdNote];
   }
 
   setupPiano() {
@@ -224,6 +238,7 @@ export class AppComponent implements AfterViewInit {
     });
     // Add main SVG to piano div
     piano.appendChild(SVG);
+    this.bindNotesIds();
   }
 
   createOctave(octaveNumber: any) {
@@ -296,18 +311,31 @@ export class AppComponent implements AfterViewInit {
     return svg;
   }
 
-  displayNotes(notes: string[]) {
+  displayNotes(notes: number[]) {
+    let pianoKeyNames: any = [];
+    /*
+    const naturalName = key.dataset.noteName;
+    const sharpName = key.dataset.sharpName;
+    const flatName = key.dataset.flatName;
+    */
+    notes.forEach((keyId: number) => {
+      const keyAssociated: HTMLElement = (document.getElementsByClassName(`note${keyId}`)[0] as HTMLElement);
+      pianoKeyNames.push(keyAssociated);
+      keyAssociated.classList.add("show");
+    });
+    const fundamentalNote = notes[0];
+    this.setText(fundamentalNote);
+  }
+
+  bindNotesIds() {
     const pianoKeys = this.retrieveNotesAfterCleaning();
-    pianoKeys
-    notes.forEach((noteName: any) => {
-      pianoKeys.forEach((key: any) => {
-        const naturalName = key.dataset.noteName;
-        const sharpName = key.dataset.sharpName;
-        const flatName = key.dataset.flatName;
-        if (naturalName === noteName || sharpName === noteName || flatName === noteName) {
-          key.classList.add("show");
-        }
-      });
+    let i = 0;
+    pianoKeys.forEach((key: any) => {
+      const currentNote = this.allNotes[i]
+      const lengthNote = currentNote.length;
+      const idNote = currentNote[lengthNote - 1]; // represent ID of my note
+      key.classList.add(`note${idNote}`);
+      i++
     });
   }
 
@@ -363,36 +391,37 @@ export class AppComponent implements AfterViewInit {
     , ['E4', '41']
   ];
 
-  displayNotesv2(notes: number[], type: string) {
-    const list: string[] = [];
-    notes.forEach((index: number) => {
-      list.push(this.allNotes[index - 1][0]);
-    });
-    const baseNoteIndex = notes[0];
-    const baseNoteName = this.allNotes[baseNoteIndex - 1][0];
-    let diese = '';
-    if (baseNoteName.includes('#')) // 
-      diese = '#';
-    this.nameNote = `${baseNoteName.charAt(0)}${diese} (${this.translateToFrench(baseNoteName.charAt(0))}${diese}) ${type}`;
-    if (diese) {
-      const baseNoteNameBemol = this.allNotes[baseNoteIndex - 1][1];
-      this.nameNote += ` / ${baseNoteNameBemol.charAt(0)}♭ (${this.translateToFrench(baseNoteNameBemol.charAt(0))}♭) ${type}`;
-    }
-    this.displayNotes(list);
-    let newList: any = []; // change tone +2
-    for (let note of list) {
-      if (note.includes('1'))
-        note = note.replace('1', '3');
-      else if (note.includes('2'))
-        note = note.replace('2', '4');
-      else if (note.includes('3'))
-        note = note.replace('3', '5');
-      else if (note.includes('4'))
-        note = note.replace('4', '6');
-      newList.push(note);
+  displayNotesv2(idNotes: number[]) {
+    this.retrieveNotesAfterCleaning();
+    this.displayNotes(idNotes);
+    let newList: string[] = [];
+    for (let idNote of idNotes) { // change tone +2
+      let noteName = this.allNotes[idNote][0];
+      if (noteName.includes('1'))
+        noteName = noteName.replace('1', '3');
+      else if (noteName.includes('2'))
+        noteName = noteName.replace('2', '4');
+      else if (noteName.includes('3'))
+        noteName = noteName.replace('3', '5');
+      else if (noteName.includes('4'))
+        noteName = noteName.replace('4', '6');
+      newList.push(noteName);
     };
+    console.log('newlist', newList);
     if (this.sound && this.toneLoadingState === 'LOADED')
       this.pianoSong.triggerAttackRelease([...newList], 2.5);
+  }
+
+  setText(noteKey: number) {
+    const note = this.allNotes[noteKey];
+    console.log('note', note);
+    let diese = '';
+    if (note[0].includes('#')) // 
+      diese = '#';
+    this.nameNote = `${note[0].charAt(0)}${diese} (${this.translateToFrench(note[0].charAt(0))}${diese}) ${this.typeExercice}`;
+    if (diese) {
+      this.nameNote += ` / ${note[1].charAt(0)}♭ (${this.translateToFrench(note[1].charAt(0))}♭) ${this.typeExercice}`;
+    }
   }
 
   translateToFrench(letter: string) {
@@ -419,14 +448,10 @@ export class AppComponent implements AfterViewInit {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  gammeDoMajeur() {
-    this.displayNotes(['C1', 'D1', 'E1', 'F1', 'G1', 'A1', 'B1',]);
+  updateGammeParameter(value: string) {
+    this.gammeParameter = value;
   }
-
-  gamme = 'all';
-
-  updateGamme(value: string) {
-    this.gamme = value;
-    // this.gamme = value;
+  updateTriadeParameter(value: string) {
+    this.triadeTypeParameter = value;
   }
 }
