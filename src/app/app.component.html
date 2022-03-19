@@ -9,7 +9,7 @@
             class="flex justify-center items-center bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
             <span>Activer le son</span> <img class="ml-2 invert" src="./assets/volume.png" />
         </button>
-        <button id="buttonMute" *ngIf="!sound" (click)="disableSound()" (touchstart)="disableSound()"
+        <button id="buttonMute" *ngIf="sound" (click)="disableSound()" (touchstart)="disableSound()"
             style="min-width: 200px;"
             class="flex justify-center items-center bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
             <span>Désactiver le son</span> <img class="ml-2 invert" src="./assets/volume-mute.png" />
