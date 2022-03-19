@@ -2,9 +2,8 @@ import { AfterViewInit, Component, ViewChild, ViewEncapsulation } from '@angular
 import { interval, Subscription } from 'rxjs';
 import * as Tone from 'tone';
 const StartAudioContext = require('startaudiocontext');
-
 const unmuteAudio = require('unmute-ios-audio');
-
+declare var unmute: any;
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -30,7 +29,7 @@ export class AppComponent implements AfterViewInit {
   gammeParameter: string = 'all';
   triadeTypeParameter: string = 'all'; // 'min' | 'maj' | 'all'
   typeExercice: string = '';
-  version = '1.0.0';
+  version = '2.0.0';
   myAppURL = 'https://piano-as-a-game.herokuapp.com';
   utils = {
     createSVGElement(el: any) {
@@ -56,9 +55,9 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     unmuteAudio();
+    this.test();
     this.setupPiano();
     this.initPianoSong();
-    this.test();
     this.mySubscription = interval(this.timerRefresh).subscribe((x => {
       this.generateNotesRandomly();
     }));
@@ -81,6 +80,7 @@ export class AppComponent implements AfterViewInit {
 
   async soundAuthorized() {
     this.sound = true;
+    this.test();
     this.pianoSong = new Tone.Sampler({
       urls: {
         "C4": "C4.mp3",
@@ -97,21 +97,24 @@ export class AppComponent implements AfterViewInit {
   }
 
   test() {
-    window.addEventListener('touchstart', () => {
-      var AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      var context = new AudioContext();
-      // create empty buffer
-      var buffer = context.createBuffer(1, 1, 22050);
-      var source = context.createBufferSource();
-      source.buffer = buffer;
+    // Create an audio context instance if WebAudio is supported
+    let context = (window.AudioContext || (window as any).webkitAudioContext) ?
+      new (window.AudioContext || (window as any).webkitAudioContext)() : null;
+    console.log('context', context);
+    // Decide on some parameters
+    let allowBackgroundPlayback = false; // default false, recommended false
+    let forceIOSBehavior = false; // default false, recommended false
+    // Pass it to unmute if the context exists... ie WebAudio is supported
+    if (context) {
+      // If you need to be able to disable unmute at a later time, you can use the returned handle's dispose() method
+      // if you don't need to do that (most folks won't) then you can simply ignore the return value
+      let unmuteHandle = unmute(context, allowBackgroundPlayback, forceIOSBehavior);
 
-      // connect to output (your speakers)
-      source.connect(context.destination);
+      // ... at some later point you wish to STOP unmute control
+      // unmuteHandle.dispose();
+      // unmuteHandle = null;
 
-      // play the file
-      source.start ? source.start(0) : (source as any).noteOn(0);
-      console.log('do a weird trick');
-    }, false);
+    }
   }
   updateTimer(newValue: number) {
     this.timerSecondsBased = newValue;
