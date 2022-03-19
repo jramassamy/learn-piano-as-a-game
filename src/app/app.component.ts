@@ -32,6 +32,7 @@ export class AppComponent implements AfterViewInit {
   version = '2.0.0';
   myAppURL = 'https://piano-as-a-game.herokuapp.com';
   typeNoteIntermediate = '';
+  firstNoteId: number = -1;
   utils = {
     createSVGElement(el: any) {
       const element = document.createElementNS("http://www.w3.org/2000/svg", el);
@@ -135,7 +136,9 @@ export class AppComponent implements AfterViewInit {
   generateNotesRandomly() {
     this.nameNote = '';
     this.typeNoteIntermediate = '';
+    this.firstNoteId = -1;
     let firstNote = this.randomNoteFromGamme(this.gammeParameter);
+    this.firstNoteId = firstNote;
     console.log('first note', firstNote);
     const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote);
     this.displayNotesv2(triadeNotesToPlay);
@@ -489,29 +492,28 @@ export class AppComponent implements AfterViewInit {
       noteName = key.dataset.sharpName;
     return noteName;
   }
+
+
   async displayNotesv2(idNotes: number[]) {
     this.retrieveNotesAfterCleaning();
     this.displayNotes(idNotes);
     let newList: string[] = [];
-    let firstKey: any = null;
     for (let idNote of idNotes) { // change tone +2
       let key: any = document.getElementsByClassName(`note${idNote}`)[0];
       let noteName = this.parseNoteName(key);
-      // if (noteName.includes('1'))
-      //   noteName = noteName.replace('1', '3');
-      // else if (noteName.includes('2'))
-      //   noteName = noteName.replace('2', '4');
-      // else if (noteName.includes('3'))
-      //   noteName = noteName.replace('3', '5');
-      // else if (noteName.includes('4'))
-      //   noteName = noteName.replace('4', '6');
+      if (noteName.includes('1'))
+        noteName = noteName.replace('1', '3');
+      else if (noteName.includes('2'))
+        noteName = noteName.replace('2', '4');
+      else if (noteName.includes('3'))
+        noteName = noteName.replace('3', '5');
+      else if (noteName.includes('4'))
+        noteName = noteName.replace('4', '6');
       newList.push(noteName);
-      if (!firstKey)
-        firstKey = key;
     };
-    console.log('notes to play', newList);
-    console.log('notes ids', idNotes);
-    this.setText(firstKey);
+    // console.log('notes to play', newList);
+    // console.log('notes ids', idNotes);
+    this.setText();
     if (this.sound) {
       if (Tone.context.state !== 'running') {
         Tone.context.resume();
@@ -522,7 +524,8 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  setText(firstKey: any) {
+  setText() {
+    let firstKey: any = document.getElementsByClassName(`note${this.firstNoteId}`)[0];
     let diese = '';
     let noteName = this.parseNoteName(firstKey);
     if (noteName.includes('#')) // 
