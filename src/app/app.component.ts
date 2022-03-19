@@ -155,7 +155,7 @@ export class AppComponent implements AfterViewInit {
     if (choice === 'do_majeur') {
       let randomIndex = -1;
       if (this.triadeTypeParameter === 'all_intermediate')
-        randomIndex = this.getRandomIntInclusive(2, this.listGammeDoMajeur.length - 3); // 1T max de décalage entre chaque borne (+2 - 2)
+        randomIndex = this.getRandomIntInclusive(1, this.listGammeDoMajeur.length - 1); // 1T max de décalage entre chaque borne, ça dépend de l'id min/max de chaque gammes
       else
         randomIndex = this.getRandomIntInclusive(0, this.listGammeDoMajeur.length - 1);
       i = this.listGammeDoMajeur[randomIndex];
