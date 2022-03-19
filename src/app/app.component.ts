@@ -148,12 +148,16 @@ export class AppComponent implements AfterViewInit {
     let i = -1;
     if (choice === 'all') {
       if (this.triadeTypeParameter === 'all_intermediate')
-        i = this.getRandomIntInclusive(3, 31); // 1T max de décalage entre chaque borne
+        i = this.getRandomIntInclusive(3, 31); // 1T max de décalage entre chaque borne (+2 - 2)
       else
         i = this.getRandomIntInclusive(1, 33);
     }
     if (choice === 'do_majeur') {
-      const randomIndex = this.getRandomIntInclusive(0, this.listGammeDoMajeur.length - 1);
+      let randomIndex = -1;
+      if (this.triadeTypeParameter === 'all_intermediate')
+        randomIndex = this.getRandomIntInclusive(2, this.listGammeDoMajeur.length - 3); // 1T max de décalage entre chaque borne (+2 - 2)
+      else
+        randomIndex = this.getRandomIntInclusive(0, this.listGammeDoMajeur.length - 1);
       i = this.listGammeDoMajeur[randomIndex];
     }
     return i;
