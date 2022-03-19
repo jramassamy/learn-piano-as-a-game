@@ -139,7 +139,7 @@ export class AppComponent implements AfterViewInit {
     this.firstNoteId = -1;
     let firstNote = this.randomNoteFromGamme(this.gammeParameter);
     this.firstNoteId = firstNote;
-    console.log('first note', firstNote);
+    // console.log('first note', firstNote);
     const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote);
     this.displayNotesv2(triadeNotesToPlay);
   }
