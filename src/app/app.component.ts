@@ -29,7 +29,7 @@ export class AppComponent implements AfterViewInit {
   gammeParameter: string = 'all';
   triadeTypeParameter: string = 'all'; // 'min' | 'maj' | 'all'
   typeExercice: string = '';
-  version = '2.0.0';
+  version = '2.0.1';
   myAppURL = 'https://piano-as-a-game.herokuapp.com';
   utils = {
     createSVGElement(el: any) {
@@ -76,6 +76,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   constructor() {
+  }
+
+  disableSound() {
+    this.sound = false;
   }
 
   async soundAuthorized() {
