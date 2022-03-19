@@ -27,10 +27,11 @@ export class AppComponent implements AfterViewInit {
   toneLoadingState = 'LOADING';
   hideElements = false;
   gammeParameter: string = 'all';
-  triadeTypeParameter: string = 'all'; // 'min' | 'maj' | 'all'
+  triadeTypeParameter: string = 'all_basics'; // 'min' | 'maj' | 'all_basics' | 'all_intermediate'
   typeExercice: string = '';
   version = '2.0.0';
   myAppURL = 'https://piano-as-a-game.herokuapp.com';
+  typeNoteIntermediate = '';
   utils = {
     createSVGElement(el: any) {
       const element = document.createElementNS("http://www.w3.org/2000/svg", el);
@@ -130,6 +131,8 @@ export class AppComponent implements AfterViewInit {
   }
 
   generateNotesRandomly() {
+    this.nameNote = '';
+    this.typeNoteIntermediate = '';
     let firstNote = this.randomNoteFromGamme(this.gammeParameter)
     const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote);
     this.displayNotesv2(triadeNotesToPlay);
@@ -138,7 +141,10 @@ export class AppComponent implements AfterViewInit {
   randomNoteFromGamme(choice: string): number {
     let i = -1;
     if (choice === 'all') {
-      i = this.getRandomIntInclusive(1, 33);
+      if (this.triadeTypeParameter === 'all_intermediate')
+        i = this.getRandomIntInclusive(3, 31); // 1T max de décalage entre chaque borne
+      else
+        i = this.getRandomIntInclusive(1, 33);
     }
     if (choice === 'do_majeur') {
       const randomIndex = this.getRandomIntInclusive(0, this.listGammeDoMajeur.length - 1);
@@ -149,7 +155,10 @@ export class AppComponent implements AfterViewInit {
 
   triadesNotes(choice: string, firstNote: number): number[] {
     let majOrMin: number = -1;
-    if (choice === 'all') {
+    let fourthNote = -1;
+    let ideaToPickIntermediate = -1;
+    let newFirstNote = -1;
+    if (choice === 'all_basics') {
       majOrMin = this.getRandomIntInclusive(3, 4);
     }
     if (choice === 'min') {
@@ -158,18 +167,54 @@ export class AppComponent implements AfterViewInit {
     if (choice === 'maj') {
       majOrMin = 4;
     }
-    this.nameNote = '';
-    const secondNote = firstNote + majOrMin; // +3 or +4
-    let thirdNote = 1;
-    if (majOrMin === 4) {
+    if (choice === 'all_intermediate') {
+      majOrMin = this.getRandomIntInclusive(3, 4);
+      ideaToPickIntermediate = this.getRandomIntInclusive(1, 3);
+      if (ideaToPickIntermediate === 1) { // 7ème
+        this.typeNoteIntermediate = '7';
+        if (majOrMin === 4) {
+          fourthNote = firstNote - 1; // Do7. 1 demi-ton en dessous de la F.
+        }
+        if (majOrMin === 3) {
+          fourthNote = firstNote - 2; // Dom7 1 ton en dessous de la F.
+        }
+      }
+      if (ideaToPickIntermediate === 2) { // 9ème
+        this.typeNoteIntermediate = '9';
+        fourthNote = firstNote + 2; // Do(m)9. 1 ton au dessus de la F.
+      }
+      if (ideaToPickIntermediate === 3) { // rootless voicing
+        this.typeNoteIntermediate = 'Rootless Voicing';
+        if (majOrMin === 4) {
+          fourthNote = firstNote - 1; // 1 demi-ton en dessous de la F.
+        }
+        if (majOrMin === 3) {
+          fourthNote = firstNote - 2; // 1 ton en dessous de la F.
+        }
+        newFirstNote = firstNote + 2;
+      }
+    }
+    const secondNote = firstNote + majOrMin; // tierce, +3 or +4
+    let thirdNote = -1;
+    if (majOrMin === 4) { // quinte
       thirdNote = secondNote + 3;
       this.typeExercice = 'majeur';
     }
-    if (majOrMin === 3) {
+    if (majOrMin === 3) { // quinte
       thirdNote = secondNote + 4;
       this.typeExercice = 'mineur';
     }
-    return [firstNote, secondNote, thirdNote];
+    if (newFirstNote !== -1) {// Rootless Voicing 
+      firstNote = newFirstNote;
+      console.log('update note for rootless voicing');
+    }
+    if (fourthNote !== -1) {
+      console.log('send 4 notes');
+      return [firstNote, secondNote, thirdNote, fourthNote];
+    }
+    else {
+      return [firstNote, secondNote, thirdNote];
+    }
   }
 
   setupPiano() {
@@ -477,9 +522,9 @@ export class AppComponent implements AfterViewInit {
     let diese = '';
     if (note[0].includes('#')) // 
       diese = '#';
-    this.nameNote = `${note[0].charAt(0)}${diese} (${this.translateToFrench(note[0].charAt(0))}${diese}) ${this.typeExercice}`;
+    this.nameNote = `${note[0].charAt(0)}${diese} (${this.translateToFrench(note[0].charAt(0))}${diese}) ${this.typeExercice} ${this.typeNoteIntermediate}`;
     if (diese) {
-      this.nameNote += ` / ${note[1].charAt(0)}♭ (${this.translateToFrench(note[1].charAt(0))}♭) ${this.typeExercice}`;
+      this.nameNote += ` / ${note[1].charAt(0)}♭ (${this.translateToFrench(note[1].charAt(0))}♭) ${this.typeExercice} ${this.typeNoteIntermediate}`;
     }
   }
 
