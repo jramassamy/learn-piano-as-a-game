@@ -122,6 +122,8 @@ export class AppComponent implements AfterViewInit {
     }
   }
   updateTimer(newValue: number) {
+    if (newValue <= 0 || !newValue)
+      newValue = 4;
     this.timerSecondsBased = newValue;
     this.timerRefresh = newValue * 1000;
     this.mySubscription.unsubscribe();
@@ -133,7 +135,8 @@ export class AppComponent implements AfterViewInit {
   generateNotesRandomly() {
     this.nameNote = '';
     this.typeNoteIntermediate = '';
-    let firstNote = this.randomNoteFromGamme(this.gammeParameter)
+    let firstNote = this.randomNoteFromGamme(this.gammeParameter);
+    console.log('first note', firstNote);
     const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote);
     this.displayNotesv2(triadeNotesToPlay);
   }
@@ -206,10 +209,8 @@ export class AppComponent implements AfterViewInit {
     }
     if (newFirstNote !== -1) {// Rootless Voicing 
       firstNote = newFirstNote;
-      console.log('update note for rootless voicing');
     }
     if (fourthNote !== -1) {
-      console.log('send 4 notes');
       return [firstNote, secondNote, thirdNote, fourthNote];
     }
     else {
@@ -402,26 +403,15 @@ export class AppComponent implements AfterViewInit {
     */
     notes.forEach((keyId: number) => {
       const keyAssociated: HTMLElement = (document.getElementsByClassName(`note${keyId}`)[0] as HTMLElement);
-      pianoKeyNames.push(keyAssociated);
       keyAssociated.classList.add("show");
     });
-    const fundamentalNote = notes[0];
-    this.setText(fundamentalNote);
   }
 
   bindNotesIds() {
     const pianoKeys = this.retrieveNotesAfterCleaning();
-    let i = 0;
-    this.allNotes.forEach((note) => {
-
-    });
     pianoKeys.forEach((key: any) => { // rewrite code here
-      let nameKey = '';
-      if (key.dataset.noteName)
-        nameKey = key.dataset.noteName;
-      else if (key.dataset.sharpName)
-        nameKey = key.dataset.sharpName;
-      const idNote = this.findIdByName(nameKey);
+      let noteName = this.parseNoteName(key);
+      const idNote = this.findIdByName(noteName);
       key.classList.add(`note${idNote}`);
       /*
       const currentNote = this.allNotes[i];
@@ -491,22 +481,37 @@ export class AppComponent implements AfterViewInit {
     , ['E4', '41']
   ];
 
+  parseNoteName(key: any): string {
+    let noteName = '';
+    if (key.dataset.noteName)
+      noteName = key.dataset.noteName;
+    else if (key.dataset.sharpName)
+      noteName = key.dataset.sharpName;
+    return noteName;
+  }
   async displayNotesv2(idNotes: number[]) {
     this.retrieveNotesAfterCleaning();
     this.displayNotes(idNotes);
     let newList: string[] = [];
+    let firstKey: any = null;
     for (let idNote of idNotes) { // change tone +2
-      let noteName = this.allNotes[idNote][0];
-      if (noteName.includes('1'))
-        noteName = noteName.replace('1', '3');
-      else if (noteName.includes('2'))
-        noteName = noteName.replace('2', '4');
-      else if (noteName.includes('3'))
-        noteName = noteName.replace('3', '5');
-      else if (noteName.includes('4'))
-        noteName = noteName.replace('4', '6');
+      let key: any = document.getElementsByClassName(`note${idNote}`)[0];
+      let noteName = this.parseNoteName(key);
+      // if (noteName.includes('1'))
+      //   noteName = noteName.replace('1', '3');
+      // else if (noteName.includes('2'))
+      //   noteName = noteName.replace('2', '4');
+      // else if (noteName.includes('3'))
+      //   noteName = noteName.replace('3', '5');
+      // else if (noteName.includes('4'))
+      //   noteName = noteName.replace('4', '6');
       newList.push(noteName);
+      if (!firstKey)
+        firstKey = key;
     };
+    console.log('notes to play', newList);
+    console.log('notes ids', idNotes);
+    this.setText(firstKey);
     if (this.sound) {
       if (Tone.context.state !== 'running') {
         Tone.context.resume();
@@ -517,14 +522,15 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  setText(noteKey: number) {
-    const note = this.allNotes[noteKey];
+  setText(firstKey: any) {
     let diese = '';
-    if (note[0].includes('#')) // 
+    let noteName = this.parseNoteName(firstKey);
+    if (noteName.includes('#')) // 
       diese = '#';
-    this.nameNote = `${note[0].charAt(0)}${diese} (${this.translateToFrench(note[0].charAt(0))}${diese}) ${this.typeExercice} ${this.typeNoteIntermediate}`;
-    if (diese) {
-      this.nameNote += ` / ${note[1].charAt(0)}♭ (${this.translateToFrench(note[1].charAt(0))}♭) ${this.typeExercice} ${this.typeNoteIntermediate}`;
+    this.nameNote = `${noteName.charAt(0)}${diese} (${this.translateToFrench(noteName.charAt(0))}${diese}) ${this.typeExercice} ${this.typeNoteIntermediate}`;
+    if (diese.length) {
+      const flatName = firstKey.dataset.flatName;
+      this.nameNote += ` / ${flatName.charAt(0)}♭ (${this.translateToFrench(flatName.charAt(0))}♭) ${this.typeExercice} ${this.typeNoteIntermediate}`;
     }
   }
 
@@ -555,6 +561,7 @@ export class AppComponent implements AfterViewInit {
   updateGammeParameter(value: string) {
     this.gammeParameter = value;
   }
+
   updateTriadeParameter(value: string) {
     this.triadeTypeParameter = value;
   }
