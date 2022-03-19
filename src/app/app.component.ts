@@ -79,7 +79,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   async soundAuthorized() {
-    this.sound = true;
+    this.sound = !this.sound;
     this.test();
     this.pianoSong = new Tone.Sampler({
       urls: {
