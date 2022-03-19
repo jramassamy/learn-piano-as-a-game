@@ -77,7 +77,7 @@ export class AppComponent implements AfterViewInit {
 
   constructor() {
   }
-
+  // comment
   async soundAuthorized() {
     this.sound = true;
     this.test();
