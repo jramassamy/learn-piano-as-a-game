@@ -78,6 +78,10 @@ export class AppComponent implements AfterViewInit {
   constructor() {
   }
 
+  nothing() {
+
+  }
+
   async soundAuthorized() {
     this.sound = !this.sound;
     this.test();
