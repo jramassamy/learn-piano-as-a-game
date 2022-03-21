@@ -139,8 +139,11 @@ export class AppComponent implements AfterViewInit {
     this.firstNoteId = -1;
     let firstNote = this.randomNoteFromGamme(this.gammeParameter);
     this.firstNoteId = firstNote;
+    /**/
+    let firstKey: any = document.getElementsByClassName(`note${this.firstNoteId}`)[0];
+    let firstNoteName = this.parseNoteName(firstKey);
     // console.log('first note', firstNote);
-    const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote);
+    const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote, firstNoteName);
     this.displayNotesv2(triadeNotesToPlay);
   }
 
@@ -163,7 +166,7 @@ export class AppComponent implements AfterViewInit {
     return i;
   }
 
-  triadesNotes(choice: string, firstNote: number): number[] {
+  triadesNotes(choice: string, firstNote: number, firstNoteName: string): number[] {
     let majOrMin: number = -1;
     let fourthNote = -1;
     let ideaToPickIntermediate = -1;
