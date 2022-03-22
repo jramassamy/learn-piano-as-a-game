@@ -29,7 +29,7 @@ export class AppComponent implements AfterViewInit {
   hideElements = false;
   gammeParameter: string = 'all';
   triadeTypeParameter: string = 'all_basics'; // 'min' | 'maj' | 'all_basics' | 'all_intermediate'
-  progressionAccordParameter = 'all';
+  progressionAccordParameter = '1.4.5.4';
   progressionAccordStep = 0;
   typeExercice: string = '';
   version = '2.0.0';
