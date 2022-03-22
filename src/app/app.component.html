@@ -37,26 +37,39 @@
                 <input (ngModelChange)="updateTimer($event)" [(ngModel)]="timerSecondsBased"
                     class="text-black block w-full pl-2 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     type="number" step="1">
-                <p>Type d'accords</p>
-                <select (change)="updateTriadeParameter(triadeTypeParameter.value)" #triadeTypeParameter
-                    class="text-black block w-full pl-2 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                    <option value="all_basics" selected>Mineur/Majeur</option>
-                    <option value="all_intermediate">7eme/9eme/Rootless Voicing</option>
-                    <option value="min">Mineur</option>
-                    <option value="maj">Majeur</option>
-                    <!-- <option>Diminuée</option>
+                <ng-container *ngIf="gammeParameter === 'all'">
+                    <p>Type d'accords</p>
+                    <select (change)="updateTriadeParameter(triadeTypeParameter.value)" #triadeTypeParameter
+                        class="text-black block w-full pl-2 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="all_basics" selected>Mineur/Majeur</option>
+                        <option value="all_intermediate">7eme/9eme/Rootless Voicing</option>
+                        <option value="min">Mineur</option>
+                        <option value="maj">Majeur</option>
+                        <!-- <option>Diminuée</option>
                     <option>Augmentée</option> -->
-                </select>
+                    </select>
+                </ng-container>
                 <p>Gammes</p>
-                <select (change)="updateGammeParameter(gammeParameter.value)" #gammeParameter
+                <select (change)="updateGammeParameter(gammeParam.value)" #gammeParam
+                    [class.width-300]="gammeParameter !== 'all'"
                     class="text-black block w-full pl-2 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                     <option value="all" selected>Toutes</option>
-                    <option value="do_majeur">Do Majeur</option>
-                    <option value="do_majeur">La Mineure Naturelle (Eq. Do Maj.)</option>
+                    <option value="domaj_accord_classique">Do Majeur (Harmonie Tonale Majeure)</option>
+                    <option value="domaj_accord7">Do Majeur (Harmonie Tonale Accords 7)</option>
                 </select>
+                <ng-container *ngIf="gammeParameter !== 'all'">
+                    <p>Progression d'accords</p>
+                    <select (change)="updateProgressionAccordParameter(progressionParam.value)" #progressionParam
+                        class="text-black block w-full pl-2 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="all" selected>Toutes</option>
+                        <option value="1.4.5.4">I - IV - V - IV</option>
+                    </select>
+                </ng-container>
             </div>
-            <p class="my-4 uppercase text-center">Accords Intermédiaires disponible
-                dans types d'accords</p>
+            <p class="my-4 uppercase text-center" *ngIf="gammeParameter === 'all'">Harmonie Tonale de Do Majeur
+                (accord7 compris) disponible dans Gammes</p>
+            <p class="my-4 uppercase text-center" *ngIf="gammeParameter !== 'all'">Les accords sont définies par votre
+                tonalité harmonique</p>
         </div>
         <!-- Info Part -->
         <div [class.hidden]="hideElements" class="relative bg-gray-50 mt-4 lg:mt-8 pt-2 pb-2 px-4 rounded">
@@ -115,7 +128,7 @@
                                     <a href="https://www.youtube.com/watch?v=D8CHbZYyg7I" target="_blank"
                                         class="hover:underline">La 7ème & La 9ème + Rootless Voicing </a>
                                 </p>
-                                <p class="text-xl font-semibold text-gray-900">Accords Intermédiaire (4 notes)</p>
+                                <p class="text-xl font-semibold text-gray-900">Notes Intermédiaire (4 notes)</p>
                                 <p class="font-medium my-2">T. = Triade | DT = Demi-Ton</p>
                                 <ul class="list-none">
                                     <li class="flex justify-between"><span class="font-medium inline-block"

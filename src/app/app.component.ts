@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import * as Tone from 'tone';
+import { TonalHarmonies } from './music.model';
 const StartAudioContext = require('startaudiocontext');
 const unmuteAudio = require('unmute-ios-audio');
 declare var unmute: any;
@@ -28,6 +29,8 @@ export class AppComponent implements AfterViewInit {
   hideElements = false;
   gammeParameter: string = 'all';
   triadeTypeParameter: string = 'all_basics'; // 'min' | 'maj' | 'all_basics' | 'all_intermediate'
+  progressionAccordParameter = 'all';
+  progressionAccordStep = 0;
   typeExercice: string = '';
   version = '2.0.0';
   myAppURL = 'https://piano-as-a-game.herokuapp.com';
@@ -134,19 +137,42 @@ export class AppComponent implements AfterViewInit {
   }
 
   generateNotesRandomly() {
+    // reset
     this.nameNote = '';
     this.typeNoteIntermediate = '';
     this.firstNoteId = -1;
-    let firstNote = this.randomNoteFromGamme(this.gammeParameter);
-    this.firstNoteId = firstNote;
-    /**/
-    let firstKey: any = document.getElementsByClassName(`note${this.firstNoteId}`)[0];
-    let firstNoteName = this.parseNoteName(firstKey);
-    // console.log('first note', firstNote);
-    const triadeNotesToPlay = this.triadesNotes(this.triadeTypeParameter, firstNote, firstNoteName);
-    this.displayNotesv2(triadeNotesToPlay);
+    // select my first note
+    if (this.gammeParameter !== 'all' && this.progressionAccordParameter !== 'all') {
+      this.firstNoteId = this.progressionAccordNote();
+    } else {
+      this.firstNoteId = this.randomNoteFromGamme(this.gammeParameter);
+    }
+    let notesToPlay: number[] = [];
+    if (this.gammeParameter === 'all') {
+      notesToPlay = this.randomTriadesNotes(this.triadeTypeParameter, this.firstNoteId); // Triades + their 7 or 9 or RV if intermediate mode
+    }
+    else {
+      let firstNoteName: string = this.parseNoteNameById(this.firstNoteId);
+      const firstNoteNameCleaned = this.noteNameCleaned(firstNoteName);
+      notesToPlay = this.tonalHarmonyToPlay(firstNoteNameCleaned, this.firstNoteId);
+    }
+
+    this.displayNotesv2(notesToPlay);
   }
 
+  progressionAccordNote(): number {
+    let gammeToPick: number[] = [];
+    let note = -1;
+    if (this.gammeParameter.includes('domaj'))
+      if (this.progressionAccordParameter === '1.4.5.4')
+        gammeToPick = this.doMajeurI_IV_V_IV;
+    if (this.progressionAccordStep > gammeToPick.length - 1) {
+      this.progressionAccordStep = 0;
+    }
+    note = gammeToPick[this.progressionAccordStep];
+    this.progressionAccordStep++;
+    return note;
+  }
   randomNoteFromGamme(choice: string): number {
     let i = -1;
     if (choice === 'all') {
@@ -155,18 +181,72 @@ export class AppComponent implements AfterViewInit {
       else
         i = this.getRandomIntInclusive(1, 33);
     }
-    if (choice === 'do_majeur') {
+    if (choice.includes('domaj')) {
       let randomIndex = -1;
       if (this.triadeTypeParameter === 'all_intermediate')
-        randomIndex = this.getRandomIntInclusive(1, this.listGammeDoMajeur.length - 2); // 1T max de décalage entre chaque borne, ID Min doit être = 3 | ID Max doit être = à 31
+        randomIndex = this.getRandomIntInclusive(1, this.listNoteFromGammeDoMajeur.length - 2); // 1T max de décalage entre chaque borne, ID Min doit être = 3 | ID Max doit être = à 31
       else
-        randomIndex = this.getRandomIntInclusive(0, this.listGammeDoMajeur.length - 1);
-      i = this.listGammeDoMajeur[randomIndex];
+        randomIndex = this.getRandomIntInclusive(0, this.listNoteFromGammeDoMajeur.length - 2); // ID Max doit être à 30.
+      i = this.listNoteFromGammeDoMajeur[randomIndex];
     }
     return i;
   }
 
-  triadesNotes(choice: string, firstNote: number, firstNoteName: string): number[] {
+  noteNameCleaned(noteName: string) {
+    let text = '';
+    if (noteName.includes('#'))
+      text = noteName.substring(0, 2); // 2 premières notes D# A#...
+    else
+      text = noteName.charAt(0);
+    return text;
+  }
+
+  tonalHarmonyToPlay(noteName: string, key: number): number[] {
+    let gammeToPlay: Map<string, TonalHarmonies> = new Map<string, TonalHarmonies>();
+    let accordToPlay: string | undefined = '';
+    if (this.gammeParameter.includes('domaj')) {
+      gammeToPlay = this.gammeDoMajeurAccords;
+    }
+    if (this.gammeParameter.includes('accord_classique'))
+      accordToPlay = gammeToPlay.get(noteName)?.accord_classique;
+    else if (this.gammeParameter.includes('accord7'))
+      accordToPlay = gammeToPlay.get(noteName)?.accord7;
+    // text
+    this.typeExercice = '';
+    this.typeNoteIntermediate = '';
+
+    if (accordToPlay === 'maj') {
+      this.typeExercice = 'majeur';
+      return [key, key + 4, key + 7];
+    }
+    if (accordToPlay === 'min') {
+      this.typeExercice = 'mineur';
+      return [key, key + 3, key + 7];
+    }
+    if (accordToPlay === 'dim') {
+      this.typeExercice = 'diminuée';
+      return [key, key + 3, key + 6];
+    }
+    if (accordToPlay === 'maj7') {
+      this.typeNoteIntermediate = 'maj7';
+      return [key, key + 4, key + 7, key + 11];
+    }
+    if (accordToPlay === 'min7') {
+      this.typeNoteIntermediate = 'min7';
+      return [key, key + 3, key + 7, key + 10];
+    }
+    if (accordToPlay === 'dominante7') {
+      this.typeNoteIntermediate = 'dominante 7';
+      return [key, key + 4, key + 7, key + 10];
+    }
+    if (accordToPlay === 'min7b5') {
+      this.typeNoteIntermediate = 'min7b5';
+      return [key, key + 3, key + 6, key + 10];
+    }
+    else return [];
+  }
+
+  randomTriadesNotes(choice: string, firstNote: number): number[] {
     let majOrMin: number = -1;
     let fourthNote = -1;
     let ideaToPickIntermediate = -1;
@@ -420,7 +500,7 @@ export class AppComponent implements AfterViewInit {
   bindNotesIds() {
     const pianoKeys = this.retrieveNotesAfterCleaning();
     pianoKeys.forEach((key: any) => { // rewrite code here
-      let noteName = this.parseNoteName(key);
+      let noteName = this.parseNoteNameByHTMLElement(key);
       const idNote = this.findIdByName(noteName);
       key.classList.add(`note${idNote}`);
       /*
@@ -445,7 +525,54 @@ export class AppComponent implements AfterViewInit {
     return pianoKeys;
   }
 
-  listGammeDoMajeur = [1, 3, 5, 6, 8, 10, 12, 13, 15, 17, 18, 20, 22, 24, 25, 27, 29, 30, 32]; // max = 33;
+  listNoteFromGammeDoMajeur = [1, 3, 5, 6, 8, 10, 12, 13, 15, 17, 18, 20, 22, 24, 25, 27, 29, 30, 32]; // max = 33;
+
+  doMajeurI_IV_V_IV = [1, 6, 8, 6, 18, 20, 18, 13, 6, 20, 18]; // do fa sol fa
+  // accordsMajeurClassique = ['maj', 'min', 'min', 'maj', 'maj', 'min', 'dim'];
+
+  // accords7Majeur = ['maj7', 'min7', 'min7', 'maj7', 'dominante7', 'min7', 'min7b5'];
+
+  gammeDoMajeurAccords = new Map<string, TonalHarmonies>([
+    ["C", {
+      accord_classique: 'maj',
+      accord7: 'maj7',
+      noteFr: 'Do'
+    }],
+    ["D", {
+      accord_classique: 'min',
+      accord7: 'min7',
+      noteFr: 'Re'
+    }],
+    ["E", {
+      accord_classique: 'min',
+      accord7: 'min7',
+      noteFr: 'Mi'
+    }],
+    ["F", {
+      accord_classique: 'maj',
+      accord7: 'maj7',
+      noteFr: 'Fa'
+    }],
+    ["G", {
+      accord_classique: 'maj',
+      accord7: 'dominante7',
+      noteFr: 'Sol'
+    }],
+    ["A", {
+      accord_classique: 'min',
+      accord7: 'min7',
+      noteFr: 'La'
+    }],
+    ["B", {
+      accord_classique: 'dim',
+      accord7: 'min7b5',
+      noteFr: 'Si'
+    }]
+  ]);
+
+  gammeDoMajeur = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+
+
 
   allNotes: string[][] = [
     ['C1', '1']
@@ -491,7 +618,17 @@ export class AppComponent implements AfterViewInit {
     , ['E4', '41']
   ];
 
-  parseNoteName(key: any): string {
+  parseNoteNameByHTMLElement(key: any): string {
+    let noteName = '';
+    if (key.dataset.noteName)
+      noteName = key.dataset.noteName;
+    else if (key.dataset.sharpName)
+      noteName = key.dataset.sharpName;
+    return noteName;
+  }
+
+  parseNoteNameById(idNote: number): string {
+    let key: any = document.getElementsByClassName(`note${idNote}`)[0];
     let noteName = '';
     if (key.dataset.noteName)
       noteName = key.dataset.noteName;
@@ -506,8 +643,7 @@ export class AppComponent implements AfterViewInit {
     this.displayNotes(idNotes);
     let newList: string[] = [];
     for (let idNote of idNotes) { // change tone +2
-      let key: any = document.getElementsByClassName(`note${idNote}`)[0];
-      let noteName = this.parseNoteName(key);
+      let noteName = this.parseNoteNameById(idNote);
       if (noteName.includes('1'))
         noteName = noteName.replace('1', '3');
       else if (noteName.includes('2'))
@@ -532,13 +668,13 @@ export class AppComponent implements AfterViewInit {
   }
 
   setText() {
-    let firstKey: any = document.getElementsByClassName(`note${this.firstNoteId}`)[0];
     let diese = '';
-    let noteName = this.parseNoteName(firstKey);
+    let noteName = this.parseNoteNameById(this.firstNoteId);
     if (noteName.includes('#')) // 
       diese = '#';
     this.nameNote = `${noteName.charAt(0)}${diese} (${this.translateToFrench(noteName.charAt(0))}${diese}) ${this.typeExercice} ${this.typeNoteIntermediate}`;
     if (diese.length) {
+      let firstKey: any = document.getElementsByClassName(`note${this.firstNoteId}`)[0];
       const flatName = firstKey.dataset.flatName;
       this.nameNote += ` / ${flatName.charAt(0)}♭ (${this.translateToFrench(flatName.charAt(0))}♭) ${this.typeExercice} ${this.typeNoteIntermediate}`;
     }
@@ -569,6 +705,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   updateGammeParameter(value: string) {
+    this.progressionAccordStep = 0;
     this.gammeParameter = value;
   }
 
@@ -576,4 +713,8 @@ export class AppComponent implements AfterViewInit {
     this.triadeTypeParameter = value;
   }
 
+  updateProgressionAccordParameter(value: string) {
+    this.progressionAccordStep = 0;
+    this.progressionAccordParameter = value;
+  }
 }
