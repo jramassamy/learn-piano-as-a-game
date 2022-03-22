@@ -197,7 +197,7 @@ export class AppComponent implements AfterViewInit {
     if (choice.includes('remin')) {
       let randomIndex = -1;
       if (this.triadeTypeParameter === 'all_intermediate')
-        randomIndex = this.getRandomIntInclusive(0, this.listNoteFromGammeReMineur.length - 1); // 1T max de décalage entre chaque borne, ID Min doit être = 3 | ID Max doit être = à 31
+        randomIndex = this.getRandomIntInclusive(1, this.listNoteFromGammeReMineur.length - 1); // 1T max de décalage entre chaque borne, ID Min doit être = 3 | ID Max doit être = à 31
       else
         randomIndex = this.getRandomIntInclusive(0, this.listNoteFromGammeReMineur.length - 1); // ID Max doit être à 30.
       i = this.listNoteFromGammeReMineur[randomIndex];
