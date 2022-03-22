@@ -163,9 +163,14 @@ export class AppComponent implements AfterViewInit {
   progressionAccordNote(): number {
     let gammeToPick: number[] = [];
     let note = -1;
-    if (this.gammeParameter.includes('domaj'))
+    if (this.gammeParameter.includes('domaj')) {
       if (this.progressionAccordParameter === '1.4.5.4')
         gammeToPick = this.doMajeurI_IV_V_IV;
+    }
+    if (this.gammeParameter.includes('remin')) {
+      if (this.progressionAccordParameter === '1.4.5.4')
+        gammeToPick = this.reMineurI_IV_V_IV;
+    }
     if (this.progressionAccordStep > gammeToPick.length - 1) {
       this.progressionAccordStep = 0;
     }
@@ -184,11 +189,20 @@ export class AppComponent implements AfterViewInit {
     if (choice.includes('domaj')) {
       let randomIndex = -1;
       if (this.triadeTypeParameter === 'all_intermediate')
-        randomIndex = this.getRandomIntInclusive(1, this.listNoteFromGammeDoMajeur.length - 2); // 1T max de décalage entre chaque borne, ID Min doit être = 3 | ID Max doit être = à 31
+        randomIndex = this.getRandomIntInclusive(1, this.listNoteFromGammeDoMajeur.length - 1); // 1T max de décalage entre chaque borne, ID Min doit être = 3 | ID Max doit être = à 31
       else
-        randomIndex = this.getRandomIntInclusive(0, this.listNoteFromGammeDoMajeur.length - 2); // ID Max doit être à 30.
+        randomIndex = this.getRandomIntInclusive(0, this.listNoteFromGammeDoMajeur.length - 1); // ID Max doit être à 30.
       i = this.listNoteFromGammeDoMajeur[randomIndex];
     }
+    if (choice.includes('remin')) {
+      let randomIndex = -1;
+      if (this.triadeTypeParameter === 'all_intermediate')
+        randomIndex = this.getRandomIntInclusive(0, this.listNoteFromGammeReMineur.length - 1); // 1T max de décalage entre chaque borne, ID Min doit être = 3 | ID Max doit être = à 31
+      else
+        randomIndex = this.getRandomIntInclusive(0, this.listNoteFromGammeReMineur.length - 1); // ID Max doit être à 30.
+      i = this.listNoteFromGammeReMineur[randomIndex];
+    }
+
     return i;
   }
 
@@ -206,6 +220,9 @@ export class AppComponent implements AfterViewInit {
     let accordToPlay: string | undefined = '';
     if (this.gammeParameter.includes('domaj')) {
       gammeToPlay = this.gammeDoMajeurAccords;
+    }
+    if (this.gammeParameter.includes('remin')) {
+      gammeToPlay = this.gammeReMinNaturelleAccords;
     }
     if (this.gammeParameter.includes('accord_classique'))
       accordToPlay = gammeToPlay.get(noteName)?.accord_classique;
@@ -525,9 +542,13 @@ export class AppComponent implements AfterViewInit {
     return pianoKeys;
   }
 
-  listNoteFromGammeDoMajeur = [1, 3, 5, 6, 8, 10, 12, 13, 15, 17, 18, 20, 22, 24, 25, 27, 29, 30, 32]; // max = 33;
+  listNoteFromGammeDoMajeur: number[] = [1, 3, 5, 6, 8, 10, 12, 13, 15, 17, 18, 20, 22, 24, 25, 27, 29, 30]; // max = 30;
 
-  doMajeurI_IV_V_IV = [1, 6, 8, 6, 18, 20, 18, 13, 6, 20, 18]; // do fa sol fa
+  listNoteFromGammeReMineur: number[] = [1, 3, 5, 6, 8, 10, 11, 13, 15, 17, 18, 20, 22, 23, 25, 27, 29, 30]; // max = 30;
+
+  doMajeurI_IV_V_IV: number[] = [1, 6, 8, 6, 18, 20, 18, 13, 6, 20, 18]; // do fa sol fa
+
+  reMineurI_IV_V_IV: number[] = [3, 8, 10, 8, 15, 20, 10, 8, 20, 22, 8, 27]; // re sol la sol | re = 3, 15, 27 | sol = 8, 20, 32 qu'on oublie | la = 10, 22, 34
   // accordsMajeurClassique = ['maj', 'min', 'min', 'maj', 'maj', 'min', 'dim'];
 
   // accords7Majeur = ['maj7', 'min7', 'min7', 'maj7', 'dominante7', 'min7', 'min7b5'];
@@ -570,9 +591,43 @@ export class AppComponent implements AfterViewInit {
     }]
   ]);
 
-  gammeDoMajeur = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-
-
+  gammeReMinNaturelleAccords = new Map<string, TonalHarmonies>([ // ré mi fa sol la sib(la#) do
+    ["D", { // ré 
+      accord_classique: 'min',
+      accord7: 'min7',
+      noteFr: 'Ré'
+    }],
+    ["E", { // mi
+      accord_classique: 'min',
+      accord7: 'min7b5',
+      noteFr: 'Mi'
+    }],
+    ["F", { // fa
+      accord_classique: 'maj',
+      accord7: 'maj7',
+      noteFr: 'Fa'
+    }],
+    ["G", { // sol
+      accord_classique: 'min',
+      accord7: 'min7',
+      noteFr: 'Sol'
+    }],
+    ["A", { // la
+      accord_classique: 'min',
+      accord7: 'min7',
+      noteFr: 'La'
+    }],
+    ["A#", { // si.b , la#
+      accord_classique: 'maj',
+      accord7: 'maj7',
+      noteFr: 'Si.b / La#'
+    }],
+    ["C", {
+      accord_classique: 'maj',
+      accord7: 'dominante7',
+      noteFr: 'Do'
+    }]
+  ]);
 
   allNotes: string[][] = [
     ['C1', '1']

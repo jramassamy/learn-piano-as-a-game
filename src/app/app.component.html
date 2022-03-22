@@ -54,8 +54,10 @@
                     [class.width-300]="gammeParameter !== 'all'"
                     class="text-black block w-full pl-2 pr-10 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                     <option value="all" selected>Toutes</option>
-                    <option value="domaj_accord_classique">Do Majeur (Harmonie Tonale Majeure)</option>
                     <option value="domaj_accord7">Do Majeur (Harmonie Tonale Accords 7)</option>
+                    <option value="remin_accord7">Re Mineur (Harmonie Tonale Accords 7)</option>
+                    <option value="domaj_accord_classique">Do Majeur (Harmonie Tonale Majeure)</option>
+                    <option value="remin_accord_classique">Re Mineur (Harmonie Tonale Mineure)</option>
                 </select>
                 <ng-container *ngIf="gammeParameter !== 'all'">
                     <p>Progression d'accords</p>
