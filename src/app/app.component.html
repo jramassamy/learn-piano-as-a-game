@@ -32,7 +32,8 @@
                 <span class="flex justify-center items-center" *ngIf="hideElements">Réglages <img class="ml-2 invert"
                         src="./assets/eye.png" /></span>
             </p>
-            <p class="text-center mb-4" [class.hidden]="hideElements">{{exercice.info}}<span class="font-medium"> -
+            <p class="text-center mb-4" [class.hidden]="hideElements"><span *ngIf="exercice.info">{{exercice.info}}
+                    -</span><span class="ml-2 font-medium">
                     Timer: {{timer_exercice}}</span></p>
 
             <div [class.hidden]="hideElements"
