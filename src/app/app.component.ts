@@ -1,7 +1,10 @@
 import { AfterViewInit, Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
 import * as Tone from 'tone';
-import { TonalHarmonies } from './music.model';
+import { ModalWelcomeDialog } from './modal-welcome/modal-welcome.component';
+import { Exercice, TonalHarmonies } from './music.model';
 const StartAudioContext = require('startaudiocontext');
 const unmuteAudio = require('unmute-ios-audio');
 declare var unmute: any;
@@ -36,6 +39,18 @@ export class AppComponent implements AfterViewInit {
   myAppURL = 'https://piano-as-a-game.herokuapp.com';
   typeNoteIntermediate = '';
   firstNoteId: number = -1;
+  timerFocus = 0;
+  exercice: Exercice = {
+    gammeParameter: '',
+    triadeTypeParameter: '',
+    progressionAccordsParam: '',
+    timer: 15,
+    showTriadesParam: true,
+    showProgressionAccordParam: false,
+    showBlog: true,
+    showGammeParam: true,
+    info: ''
+  }
   utils = {
     createSVGElement(el: any) {
       const element = document.createElementNS("http://www.w3.org/2000/svg", el);
@@ -80,9 +95,31 @@ export class AppComponent implements AfterViewInit {
   initPianoSong() {
   }
 
-  constructor() {
+  constructor(public dialog: MatDialog) {
+    this.openDialog();
   }
 
+  openDialog(): void {
+    const dialogRef = this.dialog.open(ModalWelcomeDialog, { disableClose: true });
+
+    dialogRef.afterClosed().subscribe((parameters: Exercice) => {
+      this.setParameters(parameters);
+    });
+  }
+
+  setParameters(parameters: Exercice) {
+    if (parameters) {
+      this.exercice = parameters;
+      this.gammeParameter = parameters.gammeParameter;
+      this.progressionAccordParameter = parameters.progressionAccordsParam;
+      this.triadeTypeParameter = parameters.triadeTypeParameter;
+      this.timerFocus = parameters.timer;
+      this.hideElements = false;
+      if (this.timer)
+        clearInterval(this.timer);
+      this.startTimer(parameters.timer * 60);
+    }
+  }
   nothing() {
 
   }
@@ -502,7 +539,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   displayNotes(notes: number[]) {
-    let pianoKeyNames: any = [];
     /*
     const naturalName = key.dataset.noteName;
     const sharpName = key.dataset.sharpName;
@@ -771,5 +807,40 @@ export class AppComponent implements AfterViewInit {
   updateProgressionAccordParameter(value: string) {
     this.progressionAccordStep = 0;
     this.progressionAccordParameter = value;
+  }
+
+  timer_exercice: string = '__:__';
+  timer: any;
+  startTimer(secsToStart: number): void {
+    var start: number = secsToStart;
+    var h: number;
+    var m: number;
+    var s: number;
+    var temp: number;
+    this.timer = setInterval(() => {
+      h = Math.floor(start / 60 / 60)
+      // remove the hours
+      temp = start - h * 60 * 60;
+      m = Math.floor(temp / 60);
+      // remove the minuets
+      temp = temp - m * 60;
+      // what left is the seconds
+      s = temp;
+
+      // add leading zeros for aesthetics
+      var minute = m < 10 ? "0" + m : m;
+      var second = s < 10 ? "0" + s : s;
+
+      this.timer_exercice = minute + ":" + second;
+
+      if (start <= 0) {
+        // Time elapsed
+        clearInterval(this.timer);
+        this.timer_exercice = "Exercice Fini, Fécilitations 😀";
+        // Make here changes in gui when time elapsed
+        //....
+      }
+      start--;
+    }, 1000)
   }
 }

@@ -1,0 +1,34 @@
+<div class="flex flex-col w-full">
+    <p class="uppercase font-medium text-center mb-4">Sélectionne ton exercice</p>
+    <p [class.exerciceClicked]="idExercice === 1" (click)="setExercice(1)"
+        class="font-medium cursor-pointer text-blue-900">Triades Majeures Mineures</p>
+    <p [class.exerciceClicked]="idExercice === 2" (click)="setExercice(2)"
+        class="font-medium cursor-pointer text-blue-900">Triades + 7ème / 9ème note / Rootless Voicing</p>
+    <p class="w-1/4 mx-auto text-center bg-black my-4" style="height: 2px;"></p>
+    <p [class.exerciceClicked]="idExercice === 4" (click)="setExercice(4)"
+        class="font-medium cursor-pointer text-blue-900">Progression Accords I - IV - V - IV |
+        Ré Mineur (Accords 7)</p>
+    <p [class.exerciceClicked]="idExercice === 3" (click)="setExercice(3)"
+        class="font-medium cursor-pointer text-blue-900">Progression Accords I - IV - V - IV |
+        Do Majeur (Accords 7)</p>
+    <p class="w-1/4 mx-auto text-center  bg-black my-4" style="height: 2px;"></p>
+    <p [class.exerciceClicked]="idExercice === 6" (click)="setExercice(6)"
+        class="font-medium cursor-pointer text-blue-900">Progression Accords I - IV - V - IV |
+        Ré Mineur (Accords Mineur)
+    </p>
+    <p [class.exerciceClicked]="idExercice === 5" (click)="setExercice(5)"
+        class="font-medium cursor-pointer text-blue-900">Progression Accords I - IV - V - IV |
+        Do Majeur (Accords
+        Majeur)</p>
+    <div class="flex mt-4 items-center justify-start">
+        <p class="mr-4">Durée en minutes:</p>
+        <input [(ngModel)]="exercice.timer" type="number" step="1" style="width: 100px; height: 35px;"
+            class="text-black block w-full pl-2 text-base border-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" />
+    </div>
+    <p class="mt-4 text-red-500" *ngIf="showError">Sélectionne un exercice (texte bleu) en cliquant dessus puis valide
+    </p>
+    <button (click)="close()" [class.bg-gray-700]="idExercice === 0"
+        class="mt-4 bg-blue-500     text-white border-none font-medium py-2 px-4 rounded">
+        Valider
+    </button>
+</div>
