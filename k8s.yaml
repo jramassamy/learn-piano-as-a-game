@@ -1,4 +1,4 @@
-piVersion: apps/v1 # Kubernetes API version
+apiVersion: apps/v1 # Kubernetes API version
 kind: Deployment  # Kubernetes resource kind we are creating
 metadata:
   name: angular-deployment
