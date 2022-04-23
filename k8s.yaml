@@ -1,53 +1,34 @@
-apiVersion: apps/v1
-kind: Deployment
+piVersion: apps/v1 # Kubernetes API version
+kind: Deployment  # Kubernetes resource kind we are creating
 metadata:
-  name: learn-piano-as-a-game
+  name: angular-deployment
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: learn-piano-as-a-game
+  replicas: 1 # Number of replicas that will be created for this deployment
   template:
     metadata:
       labels:
         app: learn-piano-as-a-game
-        version: IMAGE_LABEL
     spec:
       containers:
       - name: learn-piano-as-a-game
-        image: lucky97120/learn-piano-as-a-game:main #dockerhub already linked :pseudo/:image_name
+        image: lucky97120/learn-piano-as-a-game:main # Image that will be used to containers in the cluster
         ports:
-        - containerPort: 80
-        resources: {}
+        - containerPort: 80 # The port that the container is running on in the cluster
 ---
-apiVersion: v1
-kind: Service
+
+kind: Service  # Kubernetes API version
+apiVersion: v1 # Kubernetes resource kind we are creating
 metadata:
-  name: learn-piano-as-a-game
+  name: angular-service
 spec:
-  type: NodePort
   selector:
     app: learn-piano-as-a-game
   ports:
-  - port: 80
-    targetPort: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: learn-piano-as-a-game
-  annotations:
-    kubernetes.io/ingress.class: nginx
-spec:
-  rules:
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: learn-piano-as-a-game
-                port:
-                  number: 80
-
-  ingressClassName: public
+  - protocol: TCP
+    port: 80   # The port that the service is running on in the cluster
+    targetPort: 80   # The port exposed by the service
+    nodePort: 31000
+  type: NodePort     # type of the service.
