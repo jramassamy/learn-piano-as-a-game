@@ -30,7 +30,7 @@ jobs:
 
       - name: docker build and push, kubectl apply
         run: |
-          docker build -t ${{ secrets.ACR_URL }}/learn-piano-as-a-game:${{ github.sha }} .
-          docker push ${{ secrets.ACR_URL }}/learn-piano-as-a-game:${{ github.sha }}
-          sed -i'' -e 's/ACR_URL/${{ secrets.ACR_URL }}/g' -e 's/AKS_URL/${{ secrets.AKS_URL }}/g' -e 's/IMAGE_LABEL/${{ github.sha }}/g' k8s.yaml
+          docker build -t ghcr.io/learn-piano-as-a-game:${{ github.sha }} .
+          docker push ghcr.io/learn-piano-as-a-game:${{ github.sha }}
+          sed -i'' -e 's/ACR_URL/ghcr.io/g' -e 's/AKS_URL/${{ secrets.AKS_URL }}/g' -e 's/IMAGE_LABEL/${{ github.sha }}/g' k8s.yaml
           kubectl apply -f k8s.yaml
