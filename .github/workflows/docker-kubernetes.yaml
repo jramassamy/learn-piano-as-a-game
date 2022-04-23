@@ -18,8 +18,8 @@ jobs:
       - name: Docker Login
         uses: docker/login-action@v1.14.1
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          username: lucky97120
+          password: 879a1636-1d31-4dac-8eb8-4f331312da85
 
       - 
         name: Kubernetes Set Context
