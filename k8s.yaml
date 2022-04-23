@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: learn-piano-as-a-game
-        image: ACR_URL/learn-piano-as-a-game:IMAGE_LABEL
+        image: lucky97120/learn-piano-as-a-game:latest #dockerhub already linked :pseudo/:image_name
         ports:
         - containerPort: 80
         resources: {}
