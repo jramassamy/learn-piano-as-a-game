@@ -1,5 +1,7 @@
-# Piano
+sed -i'' -e 's/ACR_URL/ghcr.io/g' -e 's/AKS_URL/${{ secrets.AKS_URL }}/g' -e 's/IMAGE_LABEL/${{ github.sha }}/g' k8s.yaml
 
-Piano Project created by the idea of https://www.youtube.com/channel/UC2fJkVzZK1WTy4JxwFzKSjQ & developed by myself.
+Sed command explanation:
 
-Prod. URL: https://piano-en-ligne.herokuapp.com/home
+SWAP ACR_URL to ghcr.io
+SWAP AKS_URL to ${{AKS_URL}}
+SWAP IMAGE_LABEL to ${{ github.sha }}
