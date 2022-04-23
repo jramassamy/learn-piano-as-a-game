@@ -28,17 +28,17 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: docker build and push, kubectl apply
+        run: |
+          docker build -t ghcr.io/learn-piano-as-a-game:${{ github.sha }} .
+          docker push ghcr.io/learn-piano-as-a-game:${{ github.sha }}
+          sed -i'' -e 's/ACR_URL/ghcr.io/g' -e 's/IMAGE_LABEL/${{ github.sha }}/g' k8s.yaml
+          kubectl apply -f k8s.yaml
 
-      # Runs docker hello-world
-      - name: Hello from Docker
-        run: docker run hello-world
+      # # Runs a single command using the runners shell
+      # - name: Run a one-line script
+      #   run: echo Hello, world!
 
-      # - name: docker build and push, kubectl apply
-      #   run: |
-      #     docker build -t ghcr.io/learn-piano-as-a-game:${{ github.sha }} .
-      #     docker push ghcr.io/learn-piano-as-a-game:${{ github.sha }}
-      #     sed -i'' -e 's/ACR_URL/ghcr.io/g' -e 's/IMAGE_LABEL/${{ github.sha }}/g' k8s.yaml
-      #     kubectl apply -f k8s.yaml
+      # # Runs docker hello-world
+      # - name: Hello from Docker
+      #   run: docker run hello-world
