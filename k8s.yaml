@@ -37,17 +37,17 @@ kind: Ingress
 metadata:
   name: learn-piano-as-a-game
   annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
+    kubernetes.io/ingress.class: nginx
 spec:
   rules:
-  # https://docs.microsoft.com/en-us/azure/aks/http-application-routing
-  - host: learn-piano-as-a-game.AKS_URL
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: learn-piano-as-a-game
-            port:
-              number: 80
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: learn-piano-as-a-game
+                port:
+                  number: 80
+
+  ingressClassName: public
