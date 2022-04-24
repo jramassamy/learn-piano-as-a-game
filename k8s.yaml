@@ -1,7 +1,7 @@
 apiVersion: apps/v1 # Kubernetes API version
 kind: Deployment  # Kubernetes resource kind we are creating
 metadata:
-  name: angular-deployment
+  name: learn-piano-as-a-game
 spec:
   selector:
     matchLabels:
@@ -18,17 +18,36 @@ spec:
         ports:
         - containerPort: 80 # The port that the container is running on in the cluster
 ---
-
-kind: Service  # Kubernetes API version
-apiVersion: v1 # Kubernetes resource kind we are creating
+apiVersion: v1
+kind: Service
 metadata:
-  name: angular-service
+  name: learn-piano-as-a-game
 spec:
   selector:
     app: learn-piano-as-a-game
   ports:
-  - protocol: TCP
-    port: 80   # The port that the service is running on in the cluster
-    targetPort: 80   # The port exposed by the service
-    nodePort: 31000
-  type: NodePort     # type of the service.
+  - name: learn-piano-as-a-game
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP     # type of the service.
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: learn-piano-as-a-game-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: maevalee.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: learn-piano-as-a-game
+                port:
+                  number: 80
