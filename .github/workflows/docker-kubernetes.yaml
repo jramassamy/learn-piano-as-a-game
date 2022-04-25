@@ -44,5 +44,6 @@ jobs:
 
       - name: docker build and push, kubectl apply
         run: |
+          kubectl delete -f k8s.yaml
           kubectl apply -f k8s.yaml
 

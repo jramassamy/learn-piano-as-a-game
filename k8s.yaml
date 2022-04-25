@@ -17,7 +17,6 @@ spec:
       containers:
         - name: learn-piano-as-a-game
           image: lucky97120/learn-piano-as-a-game:main
-          imagePullPolicy: Always
           ports:
             - containerPort: 80
 ---
