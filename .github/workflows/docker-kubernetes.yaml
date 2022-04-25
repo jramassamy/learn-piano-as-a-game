@@ -42,7 +42,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      # - name: docker build and push, kubectl apply
-      #   run: |
-      #     kubectl apply -f k8s.yaml
+      - name: docker build and push, kubectl apply
+        run: |
+          kubectl apply -f k8s.yaml
 
