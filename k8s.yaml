@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: learn-piano-as-a-game-deployment
+  name: learn-piano-as-a-game
   labels:
     app: learn-piano-as-a-game
 spec:
