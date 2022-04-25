@@ -96,7 +96,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   constructor(public dialog: MatDialog) {
-    console.log('hey its me');
+    console.log('hey its me jonathan');
     this.openDialog();
   }
 
