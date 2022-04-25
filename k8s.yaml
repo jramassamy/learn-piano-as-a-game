@@ -1,43 +1,45 @@
-apiVersion: apps/v1 # Kubernetes API version
-kind: Deployment  # Kubernetes resource kind we are creating
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: learn-piano-as-a-game
+  name: learn-piano-as-a-game-deployment
+  labels:
+    app: learn-piano-as-a-game
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: learn-piano-as-a-game
-  replicas: 1 # Number of replicas that will be created for this deployment
   template:
     metadata:
       labels:
         app: learn-piano-as-a-game
     spec:
       containers:
-      - name: learn-piano-as-a-game
-        image: lucky97120/learn-piano-as-a-game:main # Image that will be used to containers in the cluster
-        ports:
-        - containerPort: 80 # The port that the container is running on in the cluster
+        - name: learn-piano-as-a-game
+          image: lucky97120/learn-piano-as-a-game:main
+          ports:
+            - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: learn-piano-as-a-game
 spec:
+  type: NodePort
   selector:
     app: learn-piano-as-a-game
   ports:
-  - name: learn-piano-as-a-game
-    protocol: TCP
-    port: 80
-    targetPort: 80
-  type: ClusterIP     # type of the service.
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: learn-piano-as-a-game-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
@@ -51,3 +53,7 @@ spec:
                 name: learn-piano-as-a-game
                 port:
                   number: 80
+  tls: # < placing a host in the TLS config will determine what ends up in the cert's subjectAltNames
+  - hosts:
+    - maevalee.com
+    secretName: maevalee-com-tls
