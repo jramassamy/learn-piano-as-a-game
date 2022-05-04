@@ -43,7 +43,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
-    - host: maevalee.com
+    - host: seo-rocket.fr
       http:
         paths:
           - path: /
@@ -55,5 +55,5 @@ spec:
                   number: 80
   tls: # < placing a host in the TLS config will determine what ends up in the cert's subjectAltNames
   - hosts:
-    - maevalee.com
-    secretName: maevalee-com-tls
+    - seo-rocket.fr
+    secretName: seo-rocket-tls
